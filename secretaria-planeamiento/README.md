@@ -1,46 +1,39 @@
-# Astro Starter Kit: Basics
+# Secretaría de Planeamiento - UNLU
 
-```sh
-pnpm create astro@latest -- --template basics
+Landing page moderna de la Secretaría de Planeamiento de la Universidad Nacional de Luján, desarrollada con [Astro](https://astro.build).
+
+## Acerca del proyecto
+
+Este proyecto busca modernizar la presencia digital de la Secretaría de Planeamiento de la UNLU, ofreciendo una landing page rápida, accesible y fácil de mantener.
+
+## Tecnologías
+
+- **Astro** - Framework web estático
+- **TypeScript** - Tipado estático
+
+## Inicio rápido
+
+```bash
+# Instalar dependencias
+pnpm install
+
+# Iniciar servidor de desarrollo
+pnpm dev
+
+# Build para producción
+pnpm build
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Estructura del proyecto
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+```
+src/
+├── assets/       # Imágenes y recursos estáticos
+├── components/   # Componentes reutilizables
+├── layouts/      # Plantillas de layout
+└── pages/        # Páginas del sitio
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Licencia
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Proyecto interno de la UNLU.

@@ -1,7 +1,5 @@
-<<<<<<< Updated upstream
 # SecPlaneamiento
 Modernización web de la Secretaria de planeamiento unlu
-=======
 # Secretaría de Planeamiento - UNLU
 
 Landing page moderna de la Secretaría de Planeamiento de la Universidad Nacional de Luján, desarrollada con [Astro](https://astro.build) y estilos con [Tailwind CSS](https://tailwindcss.com).
@@ -146,4 +144,3 @@ El proyecto usa Tailwind CSS v4 integrado mediante el plugin `@tailwindcss/vite`
 ## Licencia
 
 Proyecto interno de la UNLU.
->>>>>>> Stashed changes

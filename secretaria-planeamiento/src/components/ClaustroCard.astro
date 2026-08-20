@@ -1,0 +1,56 @@
+---
+/**
+ * Componente: ClaustroCard
+ * Tarjeta temática que resume el análisis y la participación por claustro/sector.
+ */
+interface Props {
+  claustro: string;
+  description: string;
+  badge?: string;
+  icon?: string;
+  points?: string[];
+}
+
+const { claustro, description, badge, points = [] } = Astro.props;
+---
+
+<div class="bg-white rounded-xl p-6 sm:p-7 border border-gray-200 shadow-xs hover:shadow-md hover:border-unlu-green transition-all duration-200 flex flex-col justify-between">
+  <div>
+    <div class="flex items-center justify-between mb-3">
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-unlu-green/5 text-unlu-green border border-unlu-green/20">
+        {badge || "Claustro"}
+      </span>
+    </div>
+    
+    <h3 class="text-xl font-bold text-gray-900 mb-2 font-serif">
+      {claustro}
+    </h3>
+    
+    <p class="text-sm text-gray-600 leading-relaxed mb-4">
+      {description}
+    </p>
+
+    {points.length > 0 && (
+      <ul class="space-y-2 border-t border-gray-100 pt-3 text-xs text-gray-600">
+        {points.map((pt) => (
+          <li class="flex items-start gap-2">
+            <svg class="w-4 h-4 text-unlu-green shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>{pt}</span>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+
+  <div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">
+    <span class="text-xs font-medium text-gray-400">Informe disponible</span>
+    <span class="inline-flex items-center text-xs font-bold text-unlu-green hover:text-unlu-green-dark group">
+      Consultar detalles
+      <svg class="w-3.5 h-3.5 ml-1 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+      </svg>
+    </span>
+  </div>
+</div>

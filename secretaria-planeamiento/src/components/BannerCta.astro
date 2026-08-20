@@ -1,0 +1,60 @@
+---
+/**
+ * Componente: BannerCta
+ * Bloque de llamada a la acción destacado para presentar proyectos y acciones de desarrollo.
+ * Colores y estilos unificados con el prototipo de la UNLu.
+ */
+interface Props {
+  tag?: string;
+  title?: string;
+  description?: string;
+  buttonText?: string;
+  buttonHref?: string;
+  notice?: string;
+}
+
+const {
+  tag = "CONVOCATORIA ABIERTA",
+  title = "¿Tenés un proyecto o acción de desarrollo?",
+  description = "La Secretaría recibe propuestas de toda la comunidad universitaria (docentes, nodocentes, estudiantes y graduados) para integrarlas al Plan de Desarrollo Institucional.",
+  buttonText = "Presentar proyecto",
+  buttonHref = "/plan-desarrollo#proyectos",
+  notice = "Plazos extendidos por el Honorable Consejo Superior: presentación habilitada hasta el 30.04.2025."
+} = Astro.props;
+---
+
+<div class="relative overflow-hidden rounded-2xl bg-linear-to-br from-unlu-green to-unlu-green-dark text-white p-8 sm:p-10 shadow-md border-l-4 border-unlu-gold my-10">
+  <div class="relative z-10 max-w-4xl">
+    {tag && (
+      <span class="inline-block text-xs font-bold tracking-[0.15em] uppercase text-unlu-gold mb-3">
+        {tag}
+      </span>
+    )}
+
+    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white mb-3 font-serif">
+      {title}
+    </h2>
+
+    <p class="text-sm sm:text-base text-white/95 leading-relaxed mb-6 max-w-3xl">
+      {description}
+    </p>
+
+    <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+      <a
+        href={buttonHref}
+        class="inline-flex items-center justify-center px-6 py-3.5 rounded-lg font-bold text-sm bg-unlu-gold hover:bg-unlu-gold-dark text-unlu-black shadow-md transition-all hover:scale-[1.02] shrink-0"
+      >
+        <span>{buttonText}</span>
+        <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </a>
+
+      {notice && (
+        <span class="text-xs sm:text-sm text-unlu-gold-light font-medium">
+          {notice}
+        </span>
+      )}
+    </div>
+  </div>
+</div>

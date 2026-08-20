@@ -1,0 +1,38 @@
+---
+/**
+ * Componente: Breadcrumb (Migas de Pan)
+ * Navegación contextual con estilo limpio: "Inicio > Sección"
+ */
+interface Item {
+  name: string;
+  href?: string;
+}
+
+interface Props {
+  items: Item[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="Breadcrumb" class="py-4">
+  <ol class="flex items-center space-x-1.5 text-sm text-gray-500">
+    <li>
+      <a href="/" class="hover:text-unlu-green transition-colors">Inicio</a>
+    </li>
+    {items.map((item, idx) => (
+      <li class="flex items-center space-x-1.5">
+        <span class="text-gray-400">&gt;</span>
+        {item.href && idx < items.length - 1 ? (
+          <a href={item.href} class="hover:text-unlu-green transition-colors">
+            {item.name}
+          </a>
+        ) : (
+          <span class="text-gray-700 font-medium" aria-current="page">
+            {item.name}
+          </span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>

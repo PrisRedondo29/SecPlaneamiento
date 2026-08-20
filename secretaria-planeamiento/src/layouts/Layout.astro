@@ -1,0 +1,49 @@
+---
+/**
+ * Layout Principal del Portal
+ * Integra la cabecera (Navbar), pie de página (Footer), metadatos SEO y configuración base.
+ */
+import "../styles/global.css";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  activeSection?: "la-secretaria" | "autoevaluacion" | "plan-desarrollo" | "contacto" | "";
+}
+
+const {
+  title = "Secretaría de Planeamiento · UNLu",
+  description = "Autoevaluación institucional, planificación estratégica y desarrollo de la Universidad Nacional de Luján.",
+  activeSection = ""
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph / Redes Sociales -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+  </head>
+  <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-emerald-800 selection:text-white">
+    <!-- Barra de navegación superior -->
+    <Navbar activeSection={activeSection} />
+
+    <!-- Contenido principal inyectado -->
+    <main class="flex-1">
+      <slot />
+    </main>
+
+    <!-- Pie de página institucional -->
+    <Footer />
+  </body>
+</html>

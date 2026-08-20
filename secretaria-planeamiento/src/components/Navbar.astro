@@ -1,0 +1,228 @@
+---
+/**
+ * Componente: Navbar Institucional (2 niveles)
+ * Nivel 1: Barra blanca con logo UNLu (escudo), título y buscador.
+ * Línea divisoria roja (color institucional).
+ * Nivel 2: Barra verde institucional con links de navegación y dropdowns.
+ * Línea divisoria dorada al final.
+ */
+interface Props {
+  activeSection?: string;
+}
+
+const { activeSection = "" } = Astro.props;
+
+const navLinks = [
+  {
+    name: "La Secretaría",
+    href: "/la-secretaria",
+    id: "la-secretaria",
+    hasDropdown: true,
+    subItems: [
+      { name: "Misión, Visión y Valores", href: "/la-secretaria#mision" },
+      { name: "Autoridades y equipo", href: "/la-secretaria#autoridades" },
+      { name: "Actividades", href: "/la-secretaria#actividades" },
+    ],
+  },
+  {
+    name: "Autoevaluación Institucional",
+    href: "/autoevaluacion",
+    id: "autoevaluacion",
+    hasDropdown: true,
+    subItems: [
+      { name: "Informe de Autoevaluación", href: "/autoevaluacion#informe" },
+      { name: "Encuestas y análisis", href: "/autoevaluacion#encuestas" },
+      { name: "Entrevistas", href: "/autoevaluacion#entrevistas" },
+    ],
+  },
+  {
+    name: "Plan de Desarrollo Institucional",
+    href: "/plan-desarrollo",
+    id: "plan-desarrollo",
+    hasDropdown: true,
+    subItems: [
+      { name: "PDI UNLu 2025-2035", href: "/plan-desarrollo#pdi" },
+      { name: "Dimensiones de análisis", href: "/plan-desarrollo#dimensiones" },
+      { name: "Presentación Proyecto/Acción", href: "/plan-desarrollo#proyectos" },
+    ],
+  },
+  {
+    name: "Contacto",
+    href: "/contacto",
+    id: "contacto",
+    hasDropdown: false,
+    subItems: [],
+  },
+];
+---
+
+<header class="sticky top-0 z-50 shadow-md">
+  <!-- Nivel 1: Barra blanca con logo y buscador -->
+  <div class="bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo + Título -->
+        <a href="/" class="flex items-center gap-3 group">
+          <img 
+            src="/favicon.svg" 
+            alt="Escudo UNLu" 
+            class="w-12 h-12 rounded-full border-2 border-unlu-gold/30 shadow-sm"
+         />
+          <div class="flex flex-col">
+            <span class="text-lg sm:text-xl font-bold tracking-tight text-gray-900 font-sans">Secretaría de Planeamiento</span>
+            <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-gray-500">Universidad Nacional de Luján · Rectorado</span>
+          </div>
+        </a>
+
+        <!-- Buscador (solo desktop) -->
+        <div class="hidden md:flex items-center">
+          <div class="flex items-center rounded-lg overflow-hidden shadow-sm">
+            <input
+              type="text"
+              placeholder="Buscar"
+              class="px-4 py-2 text-sm text-gray-700 placeholder:text-gray-400 bg-gray-200 focus:bg-gray-50 focus:outline-none transition-colors duration-200 w-40 lg:w-52"
+            />
+            <button class="bg-unlu-green hover:bg-unlu-green-dark text-white px-3 py-[9px] transition-colors duration-200 shrink-0" aria-label="Buscar">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botón menú mobile -->
+        <button
+          id="mobile-menu-button"
+          type="button"
+          class="md:hidden inline-flex items-center justify-center p-2 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-unlu-green"
+          aria-controls="mobile-menu"
+          aria-expanded="false"
+          aria-label="Abrir menú"
+        >
+          <svg class="h-6 w-6 block" id="menu-icon-open" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+          <svg class="h-6 w-6 hidden" id="menu-icon-close" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Línea divisoria tricolor de 3px (Verde, Amarillo y Rojo) -->
+  <div class="flex h-[3px] w-full">
+    <div class="h-full bg-unlu-green w-[33.33%]"></div>
+    <div class="h-full bg-unlu-gold w-[33.34%]"></div>
+    <div class="h-full bg-unlu-red w-[33.33%]"></div>
+  </div>
+
+  <!-- Nivel 2: Barra verde con navegación -->
+  <nav class="hidden md:block bg-unlu-green-dark" aria-label="Navegación principal">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center h-12">
+        {navLinks.map((link) => {
+          const isActive = activeSection === link.id;
+          return (
+            <div class="relative group">
+              <a
+                href={link.href}
+                class:list={[
+                  "inline-flex items-center gap-1.5 px-4 text-sm font-medium transition-colors border-b-2",
+                  isActive
+                    ? "text-unlu-gold bg-unlu-green border-unlu-gold font-bold pt-3 pb-3.5"
+                    : "text-white hover:text-unlu-gold hover:bg-unlu-green border-transparent pt-3.5 pb-3.5"
+                ]}
+              >
+                {link.name}
+                {link.hasDropdown && (
+                  <svg class="w-3.5 h-3.5 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                  </svg>
+                )}
+              </a>
+
+              {/* Dropdown en hover */}
+              {link.hasDropdown && link.subItems.length > 0 && (
+                <div class="absolute left-0 top-full w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+                  <div class="bg-white shadow-lg border border-gray-200 py-1.5">
+                    {link.subItems.map((sub) => (
+                      <a
+                        href={sub.href}
+                        class="block px-4 py-2.5 text-sm text-gray-750 hover:bg-unlu-green/5 hover:text-unlu-green transition-colors"
+                      >
+                        {sub.name}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Panel Menú Mobile -->
+  <div class="hidden md:hidden bg-white border-t border-gray-200" id="mobile-menu">
+    <div class="px-4 pt-3 pb-6 space-y-1">
+      {navLinks.map((link) => (
+        <div>
+          <a
+            href={link.href}
+            class:list={[
+              "block px-3 py-2.5 text-base font-semibold rounded-md",
+              activeSection === link.id
+                ? "text-unlu-green bg-unlu-green/5"
+                : "text-gray-800 hover:text-unlu-green hover:bg-gray-50"
+            ]}
+          >
+            {link.name}
+          </a>
+          {link.subItems.length > 0 && (
+            <div class="pl-5 space-y-0.5 mt-0.5">
+              {link.subItems.map((sub) => (
+                <a
+                  href={sub.href}
+                  class="block px-3 py-1.5 text-sm text-gray-600 hover:text-unlu-green rounded-md"
+                >
+                  {sub.name}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</header>
+
+<script>
+  const menuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const iconOpen = document.getElementById('menu-icon-open');
+  const iconClose = document.getElementById('menu-icon-close');
+
+  if (menuButton && mobileMenu && iconOpen && iconClose) {
+    menuButton.addEventListener('click', () => {
+      const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+      menuButton.setAttribute('aria-expanded', (!isExpanded).toString());
+      mobileMenu.classList.toggle('hidden');
+      iconOpen.classList.toggle('hidden');
+      iconClose.classList.toggle('hidden');
+    });
+
+    // Cerrar menú móvil automáticamente si se hace clic en cualquier enlace interno/ancla
+    const mobileLinks = mobileMenu.querySelectorAll('a');
+    mobileLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+        menuButton.setAttribute('aria-expanded', 'false');
+        iconOpen.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+      });
+    });
+  }
+</script>

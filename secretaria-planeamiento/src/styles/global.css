@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  /* Paleta institucional UNLu (basada exactamente en el escudo favicon.svg) */
+  --color-unlu-green: #008541;
+  --color-unlu-green-dark: #004d25;
+  --color-unlu-green-light: #00ab54;
+  --color-unlu-gold: #f9c540;
+  --color-unlu-gold-light: #fbe090;
+  --color-unlu-gold-dark: #d19e1b;
+  --color-unlu-red: #b62d2e;
+  --color-unlu-black: #231f20;
+}
+
+@layer base {
+  html, body {
+    max-width: 100%;
+    overflow-x: clip; /* clip previene el scroll en el eje X de forma limpia y moderna sin interferir con sticky/fixed */
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+
+  h1, h2, h3, .font-serif-unlu {
+    font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-thumb { background: #008541; border-radius: 4px; }
+}

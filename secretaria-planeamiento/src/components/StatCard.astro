@@ -1,0 +1,42 @@
+---
+/**
+ * Componente: StatCard
+ * Tarjeta para exhibir métricas, estadísticas o cifras clave de procesos institucionales.
+ */
+interface Props {
+  value: string;
+  label: string;
+  description?: string;
+  highlight?: boolean;
+}
+
+const { value, label, description, highlight = false } = Astro.props;
+---
+
+<div class:list={[
+  "p-6 rounded-xl border transition-all duration-200",
+  highlight 
+    ? "bg-unlu-green-dark text-white border-unlu-green-dark shadow-md" 
+    : "bg-white text-gray-800 border-gray-200 shadow-xs hover:border-unlu-green"
+]}>
+  <div class:list={[
+    "text-3xl sm:text-4xl font-bold tracking-tight font-serif",
+    highlight ? "text-unlu-gold" : "text-unlu-green"
+  ]}>
+    {value}
+  </div>
+  <div class:list={[
+    "mt-2 text-sm sm:text-base font-semibold",
+    highlight ? "text-white" : "text-gray-900"
+  ]}>
+    {label}
+  </div>
+  {description && (
+    <p class:list={[
+      "mt-1.5 text-xs sm:text-sm leading-relaxed",
+      highlight ? "text-white/80" : "text-gray-500"
+    ]}>
+      {description}
+    </p>
+  )}
+</div>

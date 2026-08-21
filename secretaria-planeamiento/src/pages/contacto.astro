@@ -155,12 +155,17 @@ import ContactForm from "../components/ContactForm.astro";
                     Cómo llegar
                   </a>
 
-                  <!-- Indicador de ver mapa -->
-                  <div class="flex flex-col items-center gap-0.5 text-white/80 hover:text-white transition-colors">
-                    <svg id="map-icon-toggle" class="w-5 h-5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <!-- Indicador / Botón "Ver mapa" (Toggle) -->
+                  <div
+                    class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 active:bg-white/30 text-white font-semibold text-sm px-4 py-2.5 rounded-lg border border-white/20 hover:border-white/40 transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer group/btn"
+                  >
+                    <svg id="map-icon-toggle" class="w-4.5 h-4.5 text-unlu-gold transition-transform duration-300 group-hover/btn:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
                     </svg>
-                    <span id="map-label-toggle" class="text-[9px] font-bold uppercase tracking-wider">Ver mapa</span>
+                    <span id="map-label-toggle">Ver mapa</span>
+                    <svg id="map-chevron-toggle" class="w-4 h-4 text-white/70 group-hover/btn:text-white transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
                   </div>
                 </div>
               </div>
@@ -170,24 +175,24 @@ import ContactForm from "../components/ContactForm.astro";
           <!-- Teaser del mapa (siempre visible, borroso → invita a hacer click) -->
           <div
             id="map-teaser"
-            class="relative h-16 overflow-hidden cursor-pointer transition-all duration-500"
+            class="relative h-16 overflow-hidden cursor-pointer transition-all duration-500 group/teaser"
             aria-hidden="true"
           >
             <img
               src="/mapa-unlu.png"
               alt=""
-              class="w-full object-cover object-top scale-110 opacity-60"
+              class="w-full object-cover object-top scale-110 opacity-60 group-hover/teaser:opacity-80 transition-opacity"
               style="height: 160px; margin-top: -30px;"
             />
             <!-- Gradiente que hace que se vea recortado/invitando -->
-            <div class="absolute inset-0 bg-gradient-to-b from-unlu-green/10 via-unlu-green/40 to-unlu-green/90"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-unlu-green/10 via-unlu-green/40 to-unlu-green/90 group-hover/teaser:from-unlu-green/5 transition-colors"></div>
             <!-- Texto central de invitación -->
-            <div class="absolute inset-0 flex items-center justify-center gap-2 text-white/90">
-              <svg class="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="absolute inset-0 flex items-center justify-center gap-2 text-white/90 group-hover/teaser:text-white transition-colors">
+              <svg class="w-4 h-4 animate-bounce text-unlu-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
               </svg>
               <span class="text-xs font-bold uppercase tracking-widest">Ver mapa del campus</span>
-              <svg class="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="w-4 h-4 animate-bounce text-unlu-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
               </svg>
             </div>
@@ -252,6 +257,7 @@ import ContactForm from "../components/ContactForm.astro";
   const teaser = document.getElementById('map-teaser');
   const mapIcon = document.getElementById('map-icon-toggle');
   const mapLabel = document.getElementById('map-label-toggle');
+  const mapChevron = document.getElementById('map-chevron-toggle');
 
   if (toggle && panel && teaser) {
     // El teaser también abre el mapa al clickear
@@ -266,16 +272,16 @@ import ContactForm from "../components/ContactForm.astro";
         toggle.setAttribute('aria-expanded', 'false');
         teaser.style.height = '4rem'; // h-16
         teaser.style.opacity = '1';
-        if (mapIcon) mapIcon.style.transform = 'rotate(0deg)';
         if (mapLabel) mapLabel.textContent = 'Ver mapa';
+        if (mapChevron) mapChevron.style.transform = 'rotate(0deg)';
       } else {
         // Abrir
         panel.style.maxHeight = panel.scrollHeight + 'px';
         toggle.setAttribute('aria-expanded', 'true');
         teaser.style.height = '0px';
         teaser.style.opacity = '0';
-        if (mapIcon) mapIcon.style.transform = 'rotate(180deg)';
-        if (mapLabel) mapLabel.textContent = 'Ocultar';
+        if (mapLabel) mapLabel.textContent = 'Ocultar mapa';
+        if (mapChevron) mapChevron.style.transform = 'rotate(180deg)';
       }
     });
   }

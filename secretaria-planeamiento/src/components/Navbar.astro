@@ -167,36 +167,48 @@ const navLinks = [
     </div>
   </nav>
 
-  <!-- Panel Menú Mobile -->
-  <div class="hidden md:hidden bg-white border-t border-gray-200" id="mobile-menu">
-    <div class="px-4 pt-3 pb-6 space-y-1">
-      {navLinks.map((link) => (
-        <div>
-          <a
-            href={link.href}
-            class:list={[
-              "block px-3 py-2.5 text-base font-semibold rounded-md",
-              activeSection === link.id
-                ? "text-unlu-green bg-unlu-green/5"
-                : "text-gray-800 hover:text-unlu-green hover:bg-gray-50"
-            ]}
-          >
-            {link.name}
-          </a>
-          {link.subItems.length > 0 && (
-            <div class="pl-5 space-y-0.5 mt-0.5">
-              {link.subItems.map((sub) => (
-                <a
-                  href={sub.href}
-                  class="block px-3 py-1.5 text-sm text-gray-600 hover:text-unlu-green rounded-md"
-                >
-                  {sub.name}
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
+  <!-- Panel Menú Mobile: Backdrop con blur + Panel lateral hasta abajo -->
+  <div
+    class="fixed inset-x-0 bottom-0 top-[83px] z-40 hidden md:hidden"
+    id="mobile-menu"
+  >
+    <!-- Fondo oscuro con efecto blur -->
+    <div
+      class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300"
+      id="mobile-menu-backdrop"
+    ></div>
+
+    <!-- Panel lateral derecho: ocupa hasta abajo del todo, deja espacio a la izquierda con línea divisoria -->
+    <div class="absolute top-0 right-0 bottom-0 w-[80%] max-w-sm bg-white border-l border-gray-200 shadow-2xl overflow-y-auto">
+      <div class="px-4 pt-3 pb-6 space-y-1">
+        {navLinks.map((link) => (
+          <div>
+            <a
+              href={link.href}
+              class:list={[
+                "block px-3 py-2.5 text-base font-semibold rounded-md",
+                activeSection === link.id
+                  ? "text-unlu-green bg-unlu-green/5"
+                  : "text-gray-800 hover:text-unlu-green hover:bg-gray-50"
+              ]}
+            >
+              {link.name}
+            </a>
+            {link.subItems.length > 0 && (
+              <div class="pl-5 space-y-0.5 mt-0.5">
+                {link.subItems.map((sub) => (
+                  <a
+                    href={sub.href}
+                    class="block px-3 py-1.5 text-sm text-gray-600 hover:text-unlu-green rounded-md"
+                  >
+                    {sub.name}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 </header>
@@ -206,24 +218,45 @@ const navLinks = [
   const mobileMenu = document.getElementById('mobile-menu');
   const iconOpen = document.getElementById('menu-icon-open');
   const iconClose = document.getElementById('menu-icon-close');
+  const backdrop = document.getElementById('mobile-menu-backdrop');
 
-  if (menuButton && mobileMenu && iconOpen && iconClose) {
+  function openMenu() {
+    if (!mobileMenu || !menuButton || !iconOpen || !iconClose) return;
+    mobileMenu.classList.remove('hidden');
+    menuButton.setAttribute('aria-expanded', 'true');
+    iconOpen.classList.add('hidden');
+    iconClose.classList.remove('hidden');
+  }
+
+  function closeMenu() {
+    if (!mobileMenu || !menuButton || !iconOpen || !iconClose) return;
+    mobileMenu.classList.add('hidden');
+    menuButton.setAttribute('aria-expanded', 'false');
+    iconOpen.classList.remove('hidden');
+    iconClose.classList.add('hidden');
+  }
+
+  if (menuButton) {
     menuButton.addEventListener('click', () => {
       const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
-      menuButton.setAttribute('aria-expanded', (!isExpanded).toString());
-      mobileMenu.classList.toggle('hidden');
-      iconOpen.classList.toggle('hidden');
-      iconClose.classList.toggle('hidden');
+      if (isExpanded) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
     });
+  }
 
-    // Cerrar menú móvil automáticamente si se hace clic en cualquier enlace interno/ancla
+  if (backdrop) {
+    backdrop.addEventListener('click', closeMenu);
+  }
+
+  // Cerrar menú móvil automáticamente si se hace clic en cualquier enlace interno/ancla
+  if (mobileMenu) {
     const mobileLinks = mobileMenu.querySelectorAll('a');
     mobileLinks.forEach(link => {
       link.addEventListener('click', () => {
-        mobileMenu.classList.add('hidden');
-        menuButton.setAttribute('aria-expanded', 'false');
-        iconOpen.classList.remove('hidden');
-        iconClose.classList.add('hidden');
+        closeMenu();
       });
     });
   }

@@ -1,0 +1,46 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Logo from "@/components/Logo.astro";
+import SearchForm from "@/components/NotFound/SearchForm.astro";
+import MainSections from "@/components/NotFound/MainSections.astro";
+import EscudoIcon from "@/assets/images/escudo.svg";
+import HouseIcon from "@/components/icons/House.svg";
+---
+
+<Layout>
+	<div class="max-w-250 min-h-screen p-10 m-auto">
+		<Logo />
+		<div class="pt-10">
+			<h1 class="text-2xl font-bold text-unlu-green-dark mt-10 uppercase">
+				Secretaría de planeamiento
+			</h1>
+			<p class="mt-8 text-unlu-green text-9xl font-extrabold text-center">
+				404
+			</p>
+		</div>
+		<div class="mt-24">
+			<h3 class="font-bold text-unlu-black text-4xl">Página no encontrada</h3>
+			<p
+				class="text-center mx-auto max-w-[70ch] pt-4 text-unlu-black/80 text-lg font-semibold"
+			>
+				La pagina que estás buscando no existe o fue movida. Probá con el
+				buscador o elegí algunas de las secciones principales de la secretaría
+			</p>
+		</div>
+		<SearchForm />
+		<MainSections />
+		<a
+			href="/"
+			class="mt-6 bg-unlu-green-dark py-2 px-6 rounded-lg font-semibold text-white w-fit hover:scale-105 active:scale-95 transition-transform duration-300 flex items-center gap-2 text-lg"
+		>
+			<HouseIcon />
+			Volver al inicio
+		</a>
+		<footer class="mt-10">
+			<p class="flex items-center gap-2 font-semibold">
+				Secretaría de planeamiento ─ Universidad Nacioanl de Luján
+				<EscudoIcon class="w-7 h-auto" />
+			</p>
+		</footer>
+	</div>
+</Layout>

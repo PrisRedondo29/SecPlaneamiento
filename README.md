@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-# SecPlaneamiento
-Modernización web de la Secretaria de planeamiento unlu
-=======
 # Secretaría de Planeamiento - UNLU
 
 Landing page moderna de la Secretaría de Planeamiento de la Universidad Nacional de Luján, desarrollada con [Astro](https://astro.build) y estilos con [Tailwind CSS](https://tailwindcss.com).
@@ -125,7 +121,16 @@ Definidos como variables CSS en `global.css`:
 
 ## Configuración de Tailwind
 
-El proyecto usa Tailwind CSS v4 integrado mediante el plugin `@tailwindcss/vite` en `astro.config.mjs`. Los colores institucionales se definen como tokens CSS en `global.css` y se referencian con clases como `bg-unlu-green`, `text-unlu-gold`, etc.
+El proyecto usa Tailwind CSS v4 integrado mediante el plugin `@tailwindcss/vite` en `astro.config.mjs`. No se requiere archivo de configuración separado; las clases se usan directamente en los componentes `.astro`.
+
+```astro
+---
+// Ejemplo de uso en un componente
+---
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+  <h1 class="text-2xl font-bold text-gray-800">Hola Tailwind</h1>
+</div>
+```
 
 ## Documentación del stack
 
@@ -146,4 +151,3 @@ El proyecto usa Tailwind CSS v4 integrado mediante el plugin `@tailwindcss/vite`
 ## Licencia
 
 Proyecto interno de la UNLU.
->>>>>>> Stashed changes

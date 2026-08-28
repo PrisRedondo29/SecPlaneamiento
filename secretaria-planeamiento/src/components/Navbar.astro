@@ -57,6 +57,21 @@ const navLinks = [
 ---
 
 <header class="sticky top-0 z-50 shadow-md">
+  <!-- Barra superior institucional negra (solo visible en pantallas medianas/grandes) -->
+  <div class="hidden md:block bg-black text-white text-xs py-1.5 border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <div class="flex items-center gap-6">
+        <a href="https://www.unlu.edu.ar/" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">Portal UNLu</a>
+        <a href="https://rectorado.unlu.edu.ar/" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">Rectorado</a>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="https://webmail.unlu.edu.ar/" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">Webmail</a>
+        <a href="https://www.unlu.edu.ar/acceso-aulas-virtuales.html" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">Aulas Virtuales</a>
+        <a href="https://www.biblioteca.unlu.edu.ar/" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">Biblioteca</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Nivel 1: Barra blanca con logo y buscador -->
   <div class="bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -65,7 +80,7 @@ const navLinks = [
         <!-- Logo + Título -->
         <a href="/" class="flex items-center gap-3 group">
           <img 
-            src="/favicon.svg" 
+            src="/escudo.svg" 
             alt="Escudo UNLu" 
             class="w-12 h-12 rounded-full border-2 border-unlu-gold/30 shadow-sm"
          />

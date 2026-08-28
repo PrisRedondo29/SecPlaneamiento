@@ -33,6 +33,14 @@ const {
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+
+    <!-- Prevenir auto-scroll indeseado al recargar en iOS Safari / WebKit -->
+    <script is:inline>
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+      window.scrollTo(0, 0);
+    </script>
   </head>
   <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-emerald-800 selection:text-white">
     <!-- Barra de navegación superior -->

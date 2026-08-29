@@ -358,7 +358,12 @@ export function getBlock(id) { return BLOCK_REGISTRY.find(b => b.id === id); }
 export function renderBlock(block) {
   const def = getBlock(block.type);
   if (!def) return `<!-- Bloque desconocido: ${block.type} -->`;
-  return def.render(block.props || {}, block);
+  const html = def.render(block.props || {}, block);
+  const elementId = block.anchorId || block.id;
+  if (elementId) {
+    return `<div id="${elementId}" class="scroll-mt-28 target:ring-2 target:ring-unlu-gold target:rounded-2xl transition-all">${html}</div>`;
+  }
+  return html;
 }
 
 export function renderPage(blocks) {

@@ -257,4 +257,44 @@ const navLinks = [
       navAdminLink.innerHTML = '<span>🔑 Iniciar Sesión</span>';
     }
   }
+
+  // Smooth scroll a subsección al hacer clic en enlaces con #hash
+  document.addEventListener('click', (e) => {
+    const link = (e.target as HTMLElement)?.closest('a');
+    if (!link) return;
+    const href = link.getAttribute('href');
+    if (!href || !href.includes('#')) return;
+
+    const parts = href.split('#');
+    const path = parts[0];
+    const hash = parts[1];
+
+    if (hash && (path === '' || path === window.location.pathname)) {
+      const targetEl = document.getElementById(hash);
+      if (targetEl) {
+        e.preventDefault();
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.pushState(null, '', '#' + hash);
+      }
+    }
+  });
+
+  // Auto-scroll al cargar la página si la URL contiene #hash (ej: /autoevaluacion#encuestas)
+  function handleInitialHashScroll() {
+    if (window.location.hash) {
+      const hash = window.location.hash.substring(1);
+      const targetEl = document.getElementById(hash);
+      if (targetEl) {
+        setTimeout(() => {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
+      }
+    }
+  }
+
+  if (document.readyState === 'complete') {
+    handleInitialHashScroll();
+  } else {
+    window.addEventListener('load', handleInitialHashScroll);
+  }
 </script>

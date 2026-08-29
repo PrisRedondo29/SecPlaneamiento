@@ -1067,8 +1067,32 @@ function renderInlineFieldsForBlock(block, idx) {
     </div>`;
   }
 
-  return fieldsHtml + childrenHtml;
+  const anchorHtml = `
+    <div class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-amber-50/50 p-2.5 rounded-xl border border-amber-200/60">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-amber-900 text-xs">⚓ Ancla / Subsección:</span>
+        <input
+          type="text"
+          value="${block.anchorId || ''}"
+          onchange="window.updateBlockAnchor(${idx}, this.value)"
+          placeholder="ej: encuestas, informe, mision"
+          class="bg-white border border-amber-300 rounded-lg px-2.5 py-1 text-xs font-mono text-slate-800 outline-none focus:ring-2 focus:ring-amber-500 w-48"
+        />
+      </div>
+      <span class="text-[11px] text-amber-700">Enlace directo: <code class="font-bold">/${currentPageKey}#${block.anchorId || 'sin-ancla'}</code></span>
+    </div>
+  `;
+
+  return fieldsHtml + childrenHtml + anchorHtml;
 }
+
+window.updateBlockAnchor = function(idx, val) {
+  if (!currentBlocks[idx]) return;
+  const clean = val.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+  if (clean) currentBlocks[idx].anchorId = clean;
+  else delete currentBlocks[idx].anchorId;
+  renderBlockList();
+};
 
 window.toggleBlockPreview = function(idx) {
   const fieldsBox = document.getElementById(`block-editor-fields-${idx}`);
@@ -1132,7 +1156,10 @@ function renderBlockList() {
         <div class="flex items-center gap-2">
           <span class="text-lg">${icon}</span>
           <div>
-            <h3 class="text-xs font-bold text-slate-800">${name}</h3>
+            <div class="flex items-center gap-2">
+              <h3 class="text-xs font-bold text-slate-800">${name}</h3>
+              ${block.anchorId ? `<span class="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-mono font-bold px-2 py-0.5 rounded-md">⚓ #${block.anchorId}</span>` : ''}
+            </div>
             <span class="text-[10px] text-slate-400 font-mono">Bloque #${idx+1}</span>
           </div>
         </div>
@@ -1641,13 +1668,25 @@ function closePreviewModal() {
 // =========================================================
 // GUARDAR Y REINICIAR
 // =========================================================
-function savePage() {
-  const saved = getSavedPages();
-  saved[currentPageKey] = {
+async function savePage() {
+  const pagePayload = {
     meta: JSON.parse(JSON.stringify(currentMeta)),
     blocks: JSON.parse(JSON.stringify(currentBlocks))
   };
+  const saved = getSavedPages();
+  saved[currentPageKey] = pagePayload;
   savePages(saved);
+
+  try {
+    await fetch('/api/save-page.json', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pageKey: currentPageKey, data: pagePayload })
+    });
+  } catch (e) {
+    console.log('Falló persistencia en servidor local, mantenido en localStorage:', e);
+  }
+
   const el = document.getElementById('last-edit-time');
   if(el) el.textContent = 'Hoy ' + new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
   showToast('toast-save');
@@ -1664,6 +1703,18 @@ function resetPage() {
 
 function loadPage(key) {
   currentPageKey = key;
+  const pageSelector = document.getElementById('page-selector');
+  if (pageSelector) {
+    let opt = Array.from(pageSelector.options).find(o => o.value === key);
+    if (!opt) {
+      opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+      pageSelector.appendChild(opt);
+    }
+    pageSelector.value = key;
+  }
+
   const pageData = getPageData(key);
   currentMeta = pageData.meta || {};
   currentBlocks = pageData.blocks || [];
@@ -1698,10 +1749,10 @@ function showToast(id) {
 // =========================================================
 document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
-  const pageParam = urlParams.get('page');
-  if(pageParam && BASE_PAGES[pageParam]) {
-    const sel = document.getElementById('page-selector');
-    if(sel) sel.value = pageParam;
+  let pageParam = urlParams.get('page');
+  if (pageParam === 'pdi') pageParam = 'plan-desarrollo';
+
+  if(pageParam) {
     currentPageKey = pageParam;
   }
   loadPage(currentPageKey);

@@ -1,8 +1,7 @@
 ---
 /**
  * Componente: AdminSiteManager
- * Administración general del sitio y reordenamiento de menú principal.
- * Reemplazo moderno de la pantalla /node/15 de Drupal.
+ * Administración general del sitio, reordenamiento de menú principal, ABM de subsecciones y ajustes globales.
  */
 ---
 
@@ -19,13 +18,14 @@
         Estructura y Gestión de Contenidos del Sitio
       </h1>
       <p class="text-xs text-slate-500 mt-0.5">
-        Visualiza todas las páginas existentes, gestiona su estado y ajusta el menú principal.
+        Visualiza todas las páginas existentes, gestiona su estado, ajusta el menú principal y la configuración global.
       </p>
     </div>
 
     <div class="flex items-center gap-2">
       <button
-        onclick="window.switchTab('editor', 'new')"
+        type="button"
+        id="open-new-page-modal-btn"
         class="inline-flex items-center gap-2 bg-unlu-green hover:bg-unlu-green-dark text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md transition-transform active:scale-95 cursor-pointer"
       >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -36,22 +36,22 @@
     </div>
   </div>
 
-  <!-- Pestañas de Sub-Sección: Páginas del Sitio vs Menú Principal -->
+  <!-- Pestañas de Sub-Sección -->
   <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
     <div class="bg-slate-50 border-b border-slate-200 px-6 py-3 flex items-center gap-6">
-      <button class="text-xs font-bold text-unlu-green border-b-2 border-unlu-green pb-2 -mb-3">
-        📄 Listado de Páginas (14)
+      <button id="site-tab-pages" class="site-subtab active text-xs font-bold text-unlu-green border-b-2 border-unlu-green pb-2 -mb-3 cursor-pointer">
+        📄 Listado de Páginas (<span id="site-page-count">4</span>)
       </button>
-      <button class="text-xs font-semibold text-slate-500 hover:text-slate-900 pb-2 -mb-3 transition-colors">
-        🔗 Menú Principal de Navegación
+      <button id="site-tab-menu" class="site-subtab text-xs font-semibold text-slate-500 hover:text-slate-900 pb-2 -mb-3 transition-colors cursor-pointer">
+        🔗 Menú Principal y Subsecciones
       </button>
-      <button class="text-xs font-semibold text-slate-500 hover:text-slate-900 pb-2 -mb-3 transition-colors">
+      <button id="site-tab-settings" class="site-subtab text-xs font-semibold text-slate-500 hover:text-slate-900 pb-2 -mb-3 transition-colors cursor-pointer">
         ⚙️ Ajustes Globales
       </button>
     </div>
 
-    <!-- Tabla de Páginas -->
-    <div class="overflow-x-auto">
+    <!-- VISTA 1: TABLA DE PÁGINAS -->
+    <div id="site-view-pages" class="overflow-x-auto">
       <table class="w-full text-left text-xs">
         <thead class="bg-slate-100/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
           <tr>
@@ -63,126 +63,517 @@
             <th class="px-6 py-3.5 text-right">Acciones</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-100 font-medium text-slate-800">
-          
-          <!-- Fila 1 -->
-          <tr class="hover:bg-slate-50/80 transition-colors">
-            <td class="px-6 py-4">
-              <div class="font-bold text-slate-900 text-sm">Autoevaluación Institucional</div>
-              <div class="text-[11px] text-slate-500">Sección principal con encuestas e informe HCS</div>
-            </td>
-            <td class="px-6 py-4 font-mono text-slate-600">/autoevaluacion</td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Publicado
-              </span>
-            </td>
-            <td class="px-6 py-4 text-slate-600">usuplanea</td>
-            <td class="px-6 py-4 text-slate-500">Hoy 16:24</td>
-            <td class="px-6 py-4 text-right">
-              <div class="flex items-center justify-end gap-2">
-                <a href="/autoevaluacion" target="_blank" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200" title="Ver en vivo">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                </a>
-                <button
-                  onclick="window.switchTab('editor', 'autoevaluacion')"
-                  class="bg-unlu-green/10 hover:bg-unlu-green text-unlu-green hover:text-white font-bold px-3 py-1.5 rounded-lg transition-colors"
-                >
-                  Editar
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Fila 2 -->
-          <tr class="hover:bg-slate-50/80 transition-colors">
-            <td class="px-6 py-4">
-              <div class="font-bold text-slate-900 text-sm">Plan de Desarrollo Institucional (PDI)</div>
-              <div class="text-[11px] text-slate-500">Lineamientos estratégicos decenio 2025-2035</div>
-            </td>
-            <td class="px-6 py-4 font-mono text-slate-600">/plan-desarrollo</td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Publicado
-              </span>
-            </td>
-            <td class="px-6 py-4 text-slate-600">usuplanea</td>
-            <td class="px-6 py-4 text-slate-500">22/05/2026</td>
-            <td class="px-6 py-4 text-right">
-              <div class="flex items-center justify-end gap-2">
-                <a href="/plan-desarrollo" target="_blank" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200" title="Ver en vivo">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                </a>
-                <button
-                  onclick="window.switchTab('editor', 'pdi')"
-                  class="bg-unlu-green/10 hover:bg-unlu-green text-unlu-green hover:text-white font-bold px-3 py-1.5 rounded-lg transition-colors"
-                >
-                  Editar
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Fila 3 -->
-          <tr class="hover:bg-slate-50/80 transition-colors">
-            <td class="px-6 py-4">
-              <div class="font-bold text-slate-900 text-sm">La Secretaría</div>
-              <div class="text-[11px] text-slate-500">Misión, visión, valores y equipo directivo</div>
-            </td>
-            <td class="px-6 py-4 font-mono text-slate-600">/la-secretaria</td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Publicado
-              </span>
-            </td>
-            <td class="px-6 py-4 text-slate-600">usuplanea</td>
-            <td class="px-6 py-4 text-slate-500">12/04/2026</td>
-            <td class="px-6 py-4 text-right">
-              <div class="flex items-center justify-end gap-2">
-                <a href="/la-secretaria" target="_blank" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200" title="Ver en vivo">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                </a>
-                <button
-                  onclick="window.switchTab('editor', 'la-secretaria')"
-                  class="bg-unlu-green/10 hover:bg-unlu-green text-unlu-green hover:text-white font-bold px-3 py-1.5 rounded-lg transition-colors"
-                >
-                  Editar
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Fila 4 -->
-          <tr class="hover:bg-slate-50/80 transition-colors">
-            <td class="px-6 py-4">
-              <div class="font-bold text-slate-900 text-sm">Contacto e Internos</div>
-              <div class="text-[11px] text-slate-500">Ubicación, horario de atención e internos telefónicos</div>
-            </td>
-            <td class="px-6 py-4 font-mono text-slate-600">/contacto</td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Publicado
-              </span>
-            </td>
-            <td class="px-6 py-4 text-slate-600">usuplanea</td>
-            <td class="px-6 py-4 text-slate-500">18/02/2026</td>
-            <td class="px-6 py-4 text-right">
-              <div class="flex items-center justify-end gap-2">
-                <a href="/contacto" target="_blank" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200" title="Ver en vivo">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                </a>
-                <button
-                  onclick="window.switchTab('editor', 'contacto')"
-                  class="bg-unlu-green/10 hover:bg-unlu-green text-unlu-green hover:text-white font-bold px-3 py-1.5 rounded-lg transition-colors"
-                >
-                  Editar
-                </button>
-              </div>
-            </td>
-          </tr>
-
+        <tbody id="site-pages-tbody" class="divide-y divide-slate-100 font-medium text-slate-800">
+          <!-- Se completa dinámicamente mediante JS -->
         </tbody>
       </table>
     </div>
+
+    <!-- VISTA 2: GESTIÓN DE MENÚ Y SUBSECCIONES -->
+    <div id="site-view-menu" class="hidden p-6 space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-sm font-bold text-slate-900">ABM de Menú Principal y Botones de Subsección</h3>
+          <p class="text-xs text-slate-500">Agrega o edita categorías principales y sus sub-items enlazados a anclas de bloque (`#subseccion`).</p>
+        </div>
+        <button id="add-menu-item-btn" class="bg-unlu-green hover:bg-unlu-green-dark text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5">
+          <span>+ Agregar Categoría / Enlace</span>
+        </button>
+      </div>
+
+      <div id="menu-items-list" class="space-y-4">
+        <!-- Generado dinámicamente con sub-items -->
+      </div>
+    </div>
+
+    <!-- VISTA 3: AJUSTES GLOBALES -->
+    <div id="site-view-settings" class="hidden p-6 space-y-6">
+      <form id="global-settings-form" class="space-y-5">
+        <div class="border-b border-slate-100 pb-3">
+          <h3 class="text-sm font-bold text-slate-900">Identidad e Información Institucional</h3>
+          <p class="text-xs text-slate-500">Datos visibles en la barra superior, encabezado y pie de página del sitio público.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Nombre de la Dependencia</label>
+            <input type="text" id="setting-site-name" value="Secretaría de Planeamiento" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Institución Padre</label>
+            <input type="text" id="setting-univ-name" value="Universidad Nacional de Luján · Rectorado" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Correo Electrónico Oficial</label>
+            <input type="email" id="setting-site-email" value="planeamiento@unlu.edu.ar" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Teléfono Principal e Interno</label>
+            <input type="text" id="setting-site-phone" value="+54 (02323) 423171 / 423979 (Int. 1572)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none" />
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex justify-end">
+          <button type="submit" class="bg-unlu-green hover:bg-unlu-green-dark text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md transition-all cursor-pointer">
+            Guardar Ajustes Globales
+          </button>
+        </div>
+      </form>
+    </div>
+
   </div>
 </div>
+
+<!-- MODAL: CREAR NUEVA PÁGINA -->
+<div id="new-page-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-5">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+      <h3 class="text-lg font-bold text-slate-900 font-sans">Crear Nueva Página</h3>
+      <button type="button" id="close-new-page-modal-btn" class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1">✕</button>
+    </div>
+
+    <form id="new-page-form" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Título de la Página <span class="text-red-500">*</span></label>
+        <input type="text" id="new-page-title" required placeholder="Ej: Informes de Gestión 2026" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none" />
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Ruta URL / Slug <span class="text-red-500">*</span></label>
+        <input type="text" id="new-page-slug" required placeholder="informes-gestion" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-900 focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none" />
+        <p class="text-[11px] text-slate-400 mt-1">La URL se formará como <code>/[slug]</code> (solo letras minúsculas y guiones).</p>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Etiqueta Superior (Badge)</label>
+        <input type="text" id="new-page-badge" placeholder="INFORMACIÓN COMPLEMENTARIA" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none" />
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Subtítulo del Encabezado (Hero)</label>
+        <textarea id="new-page-subtitle" rows="2" placeholder="Resumen descriptivo del contenido..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none"></textarea>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+        <button type="button" id="cancel-new-page-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-4 py-2.5 rounded-xl">Cancelar</button>
+        <button type="submit" class="bg-unlu-green hover:bg-unlu-green-dark text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md transition-all cursor-pointer">Crear e Ir al Editor</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: AGREGAR / EDITAR ITEM O SUB-ITEM DE MENÚ -->
+<div id="menu-item-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-5">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+      <h3 id="menu-modal-title" class="text-base font-bold text-slate-900">Agregar Enlace / Subsección al Menú</h3>
+      <button type="button" onclick="closeMenuModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold p-1">✕</button>
+    </div>
+
+    <form id="menu-item-form" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Nombre Visible del Botón <span class="text-red-500">*</span></label>
+        <input type="text" id="menu-input-name" required placeholder="Ej: Encuestas y Análisis" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none" />
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Página Destino <span class="text-red-500">*</span></label>
+        <select id="menu-input-page" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-unlu-green outline-none">
+          <option value="/la-secretaria">La Secretaría (/la-secretaria)</option>
+          <option value="/autoevaluacion">Autoevaluación Institucional (/autoevaluacion)</option>
+          <option value="/plan-desarrollo">Plan de Desarrollo (/plan-desarrollo)</option>
+          <option value="/contacto">Contacto (/contacto)</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Subsección / Bloque Destino (Ancla #)</label>
+        <select id="menu-input-anchor" class="w-full bg-amber-50/70 border border-amber-300 text-amber-900 font-mono text-xs rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 outline-none">
+          <option value="">-- Inicio de la página (sin ancla) --</option>
+        </select>
+        <p class="text-[11px] text-amber-700 mt-1">Escaneado automático de las anclas de bloques configuradas en la página seleccionada.</p>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">URL Completa Generada</label>
+        <input type="text" id="menu-input-full-url" readonly class="w-full bg-slate-100 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-600 outline-none" />
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+        <button type="button" onclick="closeMenuModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-4 py-2.5 rounded-xl">Cancelar</button>
+        <button type="submit" class="bg-unlu-green hover:bg-unlu-green-dark text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md transition-all cursor-pointer">Guardar Enlace</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script is:inline>
+  (function() {
+    const DEFAULT_PAGES = [
+      { key: 'autoevaluacion', title: 'Autoevaluación Institucional', desc: 'Sección principal con encuestas e informe HCS', url: '/autoevaluacion', status: 'Publicado', author: 'usuplanea', date: 'Hoy 16:24' },
+      { key: 'plan-desarrollo', title: 'Plan de Desarrollo Institucional (PDI)', desc: 'Lineamientos estratégicos decenio 2025-2035', url: '/plan-desarrollo', status: 'Publicado', author: 'usuplanea', date: '22/05/2026' },
+      { key: 'la-secretaria', title: 'La Secretaría', desc: 'Misión, visión, valores y equipo directivo', url: '/la-secretaria', status: 'Publicado', author: 'usuplanea', date: '12/04/2026' },
+      { key: 'contacto', title: 'Contacto e Internos', desc: 'Ubicación, horario de atención e internos telefónicos', url: '/contacto', status: 'Publicado', author: 'usuplanea', date: '18/02/2026' }
+    ];
+
+    const DEFAULT_MENU = [
+      {
+        name: 'La Secretaría',
+        href: '/la-secretaria',
+        subItems: [
+          { name: 'Misión, Visión y Valores', href: '/la-secretaria#mision' },
+          { name: 'Autoridades y equipo', href: '/la-secretaria#autoridades' },
+          { name: 'Actividades', href: '/la-secretaria#actividades' }
+        ]
+      },
+      {
+        name: 'Autoevaluación Institucional',
+        href: '/autoevaluacion',
+        subItems: [
+          { name: 'Informe de Autoevaluación', href: '/autoevaluacion#informe' },
+          { name: 'Encuestas y análisis', href: '/autoevaluacion#encuestas' },
+          { name: 'Entrevistas', href: '/autoevaluacion#entrevistas' }
+        ]
+      },
+      {
+        name: 'Plan de Desarrollo Institucional',
+        href: '/plan-desarrollo',
+        subItems: [
+          { name: 'PDI UNLu 2025-2035', href: '/plan-desarrollo#pdi' },
+          { name: 'Dimensiones de análisis', href: '/plan-desarrollo#dimensiones' },
+          { name: 'Presentación Proyecto/Acción', href: '/plan-desarrollo#proyectos' }
+        ]
+      },
+      {
+        name: 'Contacto',
+        href: '/contacto',
+        subItems: [
+          { name: 'Cómo llegar y Horarios', href: '/contacto#atencion-card' },
+          { name: 'Formulario de consulta', href: '/contacto#contact-form' }
+        ]
+      }
+    ];
+
+    let currentEditingParentIdx = null;
+    let currentEditingChildIdx = null;
+
+    function getCustomPagesList() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('unlu_blocks_v30') || '{}');
+        const customKeys = Object.keys(saved).filter(k => !DEFAULT_PAGES.some(p => p.key === k));
+        const customList = customKeys.map(key => {
+          const item = saved[key];
+          const meta = item.meta || {};
+          return {
+            key,
+            title: meta.heroTitle || key,
+            desc: meta.heroSubtitle || 'Página personalizada',
+            url: '/' + key,
+            status: 'Publicado',
+            author: 'usuplanea',
+            date: 'Reciente'
+          };
+        });
+        return [...DEFAULT_PAGES, ...customList];
+      } catch(e) {
+        return DEFAULT_PAGES;
+      }
+    }
+
+    function renderPagesTable() {
+      const tbody = document.getElementById('site-pages-tbody');
+      const countEl = document.getElementById('site-page-count');
+      if (!tbody) return;
+
+      const pages = getCustomPagesList();
+      if (countEl) countEl.textContent = pages.length;
+
+      tbody.innerHTML = pages.map(p => `
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-4">
+            <div class="font-bold text-slate-900 text-sm">${p.title}</div>
+            <div class="text-[11px] text-slate-500">${p.desc}</div>
+          </td>
+          <td class="px-6 py-4 font-mono text-slate-600">${p.url}</td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${p.status}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-slate-600">${p.author}</td>
+          <td class="px-6 py-4 text-slate-500">${p.date}</td>
+          <td class="px-6 py-4 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <a href="${p.url}" target="_blank" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200" title="Ver en vivo">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+              </a>
+              <button
+                onclick="window.switchTab('editor', '${p.key}')"
+                class="bg-unlu-green/10 hover:bg-unlu-green text-unlu-green hover:text-white font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+              >
+                Editar
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderMenuItems() {
+      const container = document.getElementById('menu-items-list');
+      if (!container) return;
+      let menu = JSON.parse(localStorage.getItem('unlu_site_menu') || 'null');
+      if (!menu) menu = DEFAULT_MENU;
+
+      container.innerHTML = menu.map((item, idx) => `
+        <div class="bg-slate-50 rounded-2xl border border-slate-200 p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-200/80 pb-2">
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-unlu-green text-white font-bold text-xs flex items-center justify-center">${idx + 1}</span>
+              <div>
+                <span class="text-sm font-bold text-slate-900">${item.name}</span>
+                <span class="text-xs font-mono text-slate-500 ml-2">(${item.href})</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="window.openAddSubItemModal(${idx})" class="text-xs font-bold text-unlu-green hover:bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 cursor-pointer">+ Subsección</button>
+              <button onclick="window.removeMenuItem(${idx})" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 cursor-pointer">Eliminar Categoría</button>
+            </div>
+          </div>
+
+          <!-- Sub-items del menú -->
+          <div class="pl-6 space-y-2">
+            ${(item.subItems || []).map((sub, sIdx) => `
+              <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200 text-xs">
+                <div class="flex items-center gap-2">
+                  <span class="text-slate-400">└─</span>
+                  <span class="font-semibold text-slate-800">${sub.name}</span>
+                  <span class="font-mono text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">${sub.href}</span>
+                </div>
+                <button onclick="window.removeSubMenuItem(${idx}, ${sIdx})" class="text-slate-400 hover:text-red-600 p-1" title="Eliminar sub-item">🗑️</button>
+              </div>
+            `).join('')}
+            ${(!item.subItems || item.subItems.length === 0) ? `<p class="text-[11px] text-slate-400 italic">Sin sub-enlaces asignados.</p>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.removeMenuItem = function(idx) {
+      if (!confirm('¿Eliminar esta categoría principal del menú?')) return;
+      let menu = JSON.parse(localStorage.getItem('unlu_site_menu') || 'null') || DEFAULT_MENU;
+      menu.splice(idx, 1);
+      localStorage.setItem('unlu_site_menu', JSON.stringify(menu));
+      renderMenuItems();
+    };
+
+    window.removeSubMenuItem = function(parentIdx, subIdx) {
+      let menu = JSON.parse(localStorage.getItem('unlu_site_menu') || 'null') || DEFAULT_MENU;
+      if (menu[parentIdx]?.subItems) {
+        menu[parentIdx].subItems.splice(subIdx, 1);
+        localStorage.setItem('unlu_site_menu', JSON.stringify(menu));
+        renderMenuItems();
+      }
+    };
+
+    // Sub-pestañas
+    const btnPages = document.getElementById('site-tab-pages');
+    const btnMenu = document.getElementById('site-tab-menu');
+    const btnSettings = document.getElementById('site-tab-settings');
+
+    const viewPages = document.getElementById('site-view-pages');
+    const viewMenu = document.getElementById('site-view-menu');
+    const viewSettings = document.getElementById('site-view-settings');
+
+    function setActiveSubtab(btn, view) {
+      [btnPages, btnMenu, btnSettings].forEach(b => {
+        if(b) {
+          b.classList.remove('active', 'text-unlu-green', 'border-b-2', 'border-unlu-green', 'font-bold');
+          b.classList.add('text-slate-500', 'font-semibold');
+        }
+      });
+      [viewPages, viewMenu, viewSettings].forEach(v => v?.classList.add('hidden'));
+
+      if (btn) {
+        btn.classList.add('active', 'text-unlu-green', 'border-b-2', 'border-unlu-green', 'font-bold');
+        btn.classList.remove('text-slate-500');
+      }
+      if (view) view.classList.remove('hidden');
+    }
+
+    btnPages?.addEventListener('click', () => { setActiveSubtab(btnPages, viewPages); renderPagesTable(); });
+    btnMenu?.addEventListener('click', () => { setActiveSubtab(btnMenu, viewMenu); renderMenuItems(); });
+    btnSettings?.addEventListener('click', () => setActiveSubtab(btnSettings, viewSettings));
+
+    // ABM Modal de Menú e Items
+    const menuModal = document.getElementById('menu-item-modal');
+    const pageSelect = document.getElementById('menu-input-page');
+    const anchorSelect = document.getElementById('menu-input-anchor');
+    const nameInput = document.getElementById('menu-input-name');
+    const fullUrlInput = document.getElementById('menu-input-full-url');
+
+    function updateAnchorsDropdown() {
+      if (!pageSelect || !anchorSelect) return;
+      const pageUrl = pageSelect.value;
+      const pageKey = pageUrl.replace('/', '');
+
+      // Buscar bloques en localStorage
+      anchorSelect.innerHTML = `<option value="">-- Inicio de la página (sin ancla) --</option>`;
+
+      try {
+        const saved = JSON.parse(localStorage.getItem('unlu_blocks_v30') || '{}');
+        const pageData = saved[pageKey];
+        const blocks = pageData ? pageData.blocks : [];
+        if (Array.isArray(blocks)) {
+          blocks.forEach(b => {
+            const anchor = b.anchorId || b.id;
+            const label = b.props?.titulo || b.props?.texto || b.type;
+            if (anchor) {
+              const opt = document.createElement('option');
+              opt.value = '#' + anchor;
+              opt.textContent = `#${anchor} (${label.slice(0, 30)})`;
+              anchorSelect.appendChild(opt);
+            }
+          });
+        }
+      } catch(e) {}
+
+      updateFullUrlDisplay();
+    }
+
+    function updateFullUrlDisplay() {
+      if (pageSelect && anchorSelect && fullUrlInput) {
+        fullUrlInput.value = pageSelect.value + (anchorSelect.value || '');
+      }
+    }
+
+    pageSelect?.addEventListener('change', updateAnchorsDropdown);
+    anchorSelect?.addEventListener('change', updateFullUrlDisplay);
+
+    window.openAddSubItemModal = function(parentIdx) {
+      currentEditingParentIdx = parentIdx;
+      document.getElementById('menu-modal-title').textContent = 'Agregar Subsección a ' + (DEFAULT_MENU[parentIdx]?.name || 'Categoría');
+      if (nameInput) nameInput.value = '';
+      if (menuModal) menuModal.classList.remove('hidden');
+      updateAnchorsDropdown();
+    };
+
+    document.getElementById('add-menu-item-btn')?.addEventListener('click', () => {
+      currentEditingParentIdx = null;
+      document.getElementById('menu-modal-title').textContent = 'Agregar Categoría Principal';
+      if (nameInput) nameInput.value = '';
+      if (menuModal) menuModal.classList.remove('hidden');
+      updateAnchorsDropdown();
+    });
+
+    window.closeMenuModal = function() {
+      if (menuModal) menuModal.classList.add('hidden');
+    };
+
+    document.getElementById('menu-item-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = nameInput.value.trim();
+      const href = fullUrlInput.value;
+
+      if (!name || !href) return;
+
+      let menu = JSON.parse(localStorage.getItem('unlu_site_menu') || 'null') || DEFAULT_MENU;
+
+      if (currentEditingParentIdx !== null && menu[currentEditingParentIdx]) {
+        if (!menu[currentEditingParentIdx].subItems) menu[currentEditingParentIdx].subItems = [];
+        menu[currentEditingParentIdx].subItems.push({ name, href });
+      } else {
+        menu.push({ name, href, subItems: [] });
+      }
+
+      localStorage.setItem('unlu_site_menu', JSON.stringify(menu));
+      window.closeMenuModal();
+      renderMenuItems();
+    });
+
+    // Formulario de Nueva Página
+    const modal = document.getElementById('new-page-modal');
+    const openModalBtn = document.getElementById('open-new-page-modal-btn');
+    const closeModalBtn = document.getElementById('close-new-page-modal-btn');
+    const cancelModalBtn = document.getElementById('cancel-new-page-btn');
+    const newPageForm = document.getElementById('new-page-form');
+
+    function toggleModal(show) {
+      if (modal) {
+        if (show) modal.classList.remove('hidden');
+        else modal.classList.add('hidden');
+      }
+    }
+
+    openModalBtn?.addEventListener('click', () => toggleModal(true));
+    closeModalBtn?.addEventListener('click', () => toggleModal(false));
+    cancelModalBtn?.addEventListener('click', () => toggleModal(false));
+
+    newPageForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('new-page-title').value.trim();
+      let slug = document.getElementById('new-page-slug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+      const badge = document.getElementById('new-page-badge').value.trim() || 'SECCIÓN INSTITUCIONAL';
+      const subtitle = document.getElementById('new-page-subtitle').value.trim() || 'Contenido oficial de la Secretaría de Planeamiento.';
+
+      if (!slug) slug = 'pagina-' + Date.now();
+
+      const newPageData = {
+        meta: {
+          title: title + ' · Secretaría de Planeamiento UNLu',
+          heroBadge: badge,
+          heroTitle: title,
+          heroSubtitle: subtitle,
+          activeSection: slug
+        },
+        blocks: [
+          {
+            id: 'blk-welcome-' + Math.random().toString(36).slice(2, 7),
+            anchorId: 'bienvenida',
+            type: 'text',
+            data: {
+              html: `<p>Bienvenido/a a la nueva sección <strong>${title}</strong>. Puedes añadir y personalizar bloques desde el editor.</p>`
+            }
+          }
+        ]
+      };
+
+      const saved = JSON.parse(localStorage.getItem('unlu_blocks_v30') || '{}');
+      saved[slug] = newPageData;
+      localStorage.setItem('unlu_blocks_v30', JSON.stringify(saved));
+
+      try {
+        await fetch('/api/save-page.json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pageKey: slug, data: newPageData })
+        });
+      } catch(err) {}
+
+      toggleModal(false);
+      renderPagesTable();
+      if (window.switchTab) {
+        window.switchTab('editor', slug);
+      }
+    });
+
+    // Formulario de Ajustes Globales
+    document.getElementById('global-settings-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const settings = {
+        siteName: document.getElementById('setting-site-name').value.trim(),
+        univName: document.getElementById('setting-univ-name').value.trim(),
+        email: document.getElementById('setting-site-email').value.trim(),
+        phone: document.getElementById('setting-site-phone').value.trim()
+      };
+      localStorage.setItem('unlu_site_settings', JSON.stringify(settings));
+      alert('¡Ajustes globales del sitio guardados exitosamente!');
+    });
+
+    // Inicializar render
+    renderPagesTable();
+  })();
+</script>

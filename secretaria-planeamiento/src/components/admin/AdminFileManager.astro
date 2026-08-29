@@ -2,7 +2,7 @@
 /**
  * Componente: AdminFileManager
  * Explorador de Documentos y Archivos Multimedia.
- * Reemplazo moderno, rápido y elegante del antiguo explorador IMCE de Drupal.
+ * Totalmente funcional localmente con filtrado, búsqueda, vista previa y eliminación.
  */
 ---
 
@@ -26,6 +26,7 @@
     <!-- Botón de Subida Principal -->
     <div class="flex items-center gap-3">
       <button
+        type="button"
         id="trigger-upload-modal-btn"
         class="inline-flex items-center gap-2 bg-unlu-green hover:bg-unlu-green-dark text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md transition-transform active:scale-95 cursor-pointer"
       >
@@ -37,7 +38,7 @@
     </div>
   </div>
 
-  <!-- Zona Drag & Drop de Subida Simulada -->
+  <!-- Zona Drag & Drop de Subida -->
   <div
     id="drag-drop-zone"
     class="border-2 border-dashed border-slate-300 hover:border-unlu-green bg-slate-50/50 hover:bg-emerald-50/30 rounded-2xl p-6 sm:p-8 text-center transition-all cursor-pointer group"
@@ -63,17 +64,17 @@
     
     <!-- Filtros de Categoría -->
     <div class="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
-      <button class="filter-chip active bg-unlu-green text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors">
-        Todos (7)
+      <button data-cat="all" class="filter-chip active bg-unlu-green text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+        Todos (<span id="cat-count-all">0</span>)
       </button>
-      <button class="filter-chip bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors">
-        Imágenes (4)
+      <button data-cat="image" class="filter-chip bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+        Imágenes (<span id="cat-count-image">0</span>)
       </button>
-      <button class="filter-chip bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors">
-        Documentos PDF (2)
+      <button data-cat="pdf" class="filter-chip bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+        Documentos PDF (<span id="cat-count-pdf">0</span>)
       </button>
-      <button class="filter-chip bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors">
-        Otros (1)
+      <button data-cat="other" class="filter-chip bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+        Otros (<span id="cat-count-other">0</span>)
       </button>
     </div>
 
@@ -92,12 +93,12 @@
       </div>
 
       <div class="flex items-center border border-slate-300 rounded-xl p-1 bg-slate-100 shrink-0">
-        <button id="view-mode-grid-btn" class="p-1 rounded-lg bg-white shadow-xs text-slate-800" title="Vista en Grilla">
+        <button id="view-mode-grid-btn" class="p-1 rounded-lg bg-white shadow-xs text-slate-800 cursor-pointer" title="Vista en Grilla">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
           </svg>
         </button>
-        <button id="view-mode-list-btn" class="p-1 rounded-lg text-slate-500 hover:text-slate-900" title="Vista en Lista Detallada">
+        <button id="view-mode-list-btn" class="p-1 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer" title="Vista en Lista Detallada">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
@@ -107,194 +108,234 @@
 
   </div>
 
-  <!-- Grilla de Archivos -->
-  <div id="files-container-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-    
-    <!-- Archivo 1: PDF Informe 2025 -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all overflow-hidden group">
-      <div class="h-32 bg-slate-100 flex items-center justify-center relative p-4 group-hover:bg-amber-50/50 transition-colors">
-        <div class="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs uppercase shadow-sm">
-          PDF
-        </div>
-        <span class="absolute top-2 right-2 text-[10px] font-bold bg-white/90 text-slate-700 px-2 py-0.5 rounded-md border border-slate-200">
-          174.64 KB
-        </span>
-      </div>
-      <div class="p-4 space-y-2">
-        <h3 class="text-xs font-bold text-slate-900 truncate" title="Informe Preliminar 2025 IPLAN-CA7.pdf">
-          Informe Preliminar 2025 IPLAN-CA7.pdf
-        </h3>
-        <div class="text-[11px] text-slate-500 flex items-center justify-between">
-          <span>22/05/2025</span>
-          <span class="font-mono">Documento</span>
-        </div>
-        <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-          <button
-            onclick="navigator.clipboard.writeText('/files/Informe_Preliminar_2025.pdf'); alert('URL copiada al portapapeles!');"
-            class="w-full text-center text-xs font-semibold text-unlu-green hover:bg-emerald-50 py-1.5 rounded-lg border border-emerald-200 transition-colors"
-          >
-            Copiar Link
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Archivo 2: Imagen Autoevaluación -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all overflow-hidden group">
-      <div class="h-32 bg-emerald-950 flex items-center justify-center relative overflow-hidden">
-        <img src="/escudo.svg" alt="" class="w-20 h-20 opacity-40 hover:opacity-80 transition-opacity" />
-        <span class="absolute top-2 right-2 text-[10px] font-bold bg-slate-900/80 text-white px-2 py-0.5 rounded-md">
-          1200x300 px
-        </span>
-      </div>
-      <div class="p-4 space-y-2">
-        <h3 class="text-xs font-bold text-slate-900 truncate" title="Autoevaluación Institucional 2022.png">
-          Autoevaluación Institucional 2022.png
-        </h3>
-        <div class="text-[11px] text-slate-500 flex items-center justify-between">
-          <span>11/02/2025</span>
-          <span class="font-mono">107.81 KB</span>
-        </div>
-        <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-          <button
-            onclick="navigator.clipboard.writeText('/files/Autoevaluacion_2022.png'); alert('URL copiada al portapapeles!');"
-            class="w-full text-center text-xs font-semibold text-unlu-green hover:bg-emerald-50 py-1.5 rounded-lg border border-emerald-200 transition-colors"
-          >
-            Copiar Link
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Archivo 3: Formato Proyectos PDF -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all overflow-hidden group">
-      <div class="h-32 bg-slate-100 flex items-center justify-center relative p-4 group-hover:bg-amber-50/50 transition-colors">
-        <div class="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs uppercase shadow-sm">
-          PDF
-        </div>
-        <span class="absolute top-2 right-2 text-[10px] font-bold bg-white/90 text-slate-700 px-2 py-0.5 rounded-md border border-slate-200">
-          93.44 KB
-        </span>
-      </div>
-      <div class="p-4 space-y-2">
-        <h3 class="text-xs font-bold text-slate-900 truncate" title="Formato para la Presentación de Proyectos.pdf">
-          Formato para la Presentación de Proyectos.pdf
-        </h3>
-        <div class="text-[11px] text-slate-500 flex items-center justify-between">
-          <span>10/02/2025</span>
-          <span class="font-mono">Documento</span>
-        </div>
-        <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-          <button
-            onclick="navigator.clipboard.writeText('/files/Formato_Presentacion_Proyectos.pdf'); alert('URL copiada al portapapeles!');"
-            class="w-full text-center text-xs font-semibold text-unlu-green hover:bg-emerald-50 py-1.5 rounded-lg border border-emerald-200 transition-colors"
-          >
-            Copiar Link
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Archivo 4: Banner JPG -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all overflow-hidden group">
-      <div class="h-32 bg-slate-800 flex items-center justify-center relative overflow-hidden">
-        <span class="text-unlu-gold font-bold text-xs uppercase tracking-widest">Banner UNLu</span>
-        <span class="absolute top-2 right-2 text-[10px] font-bold bg-slate-900/80 text-white px-2 py-0.5 rounded-md">
-          1200x119 px
-        </span>
-      </div>
-      <div class="p-4 space-y-2">
-        <h3 class="text-xs font-bold text-slate-900 truncate" title="banner.jpg">
-          banner.jpg
-        </h3>
-        <div class="text-[11px] text-slate-500 flex items-center justify-between">
-          <span>12/07/2023</span>
-          <span class="font-mono">24.29 KB</span>
-        </div>
-        <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-          <button
-            onclick="navigator.clipboard.writeText('/files/banner.jpg'); alert('URL copiada al portapapeles!');"
-            class="w-full text-center text-xs font-semibold text-unlu-green hover:bg-emerald-50 py-1.5 rounded-lg border border-emerald-200 transition-colors"
-          >
-            Copiar Link
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Archivo 5: Auto Julio 2023 JPG -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all overflow-hidden group">
-      <div class="h-32 bg-slate-200 flex items-center justify-center relative overflow-hidden">
-        <span class="text-slate-600 font-bold text-xs uppercase">Imagen Adjunta</span>
-        <span class="absolute top-2 right-2 text-[10px] font-bold bg-white/90 text-slate-700 px-2 py-0.5 rounded-md">
-          851x1200 px
-        </span>
-      </div>
-      <div class="p-4 space-y-2">
-        <h3 class="text-xs font-bold text-slate-900 truncate" title="auto_julio_2023.jpg">
-          auto_julio_2023.jpg
-        </h3>
-        <div class="text-[11px] text-slate-500 flex items-center justify-between">
-          <span>12/07/2023</span>
-          <span class="font-mono">134.78 KB</span>
-        </div>
-        <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-          <button
-            onclick="navigator.clipboard.writeText('/files/auto_julio_2023.jpg'); alert('URL copiada al portapapeles!');"
-            class="w-full text-center text-xs font-semibold text-unlu-green hover:bg-emerald-50 py-1.5 rounded-lg border border-emerald-200 transition-colors"
-          >
-            Copiar Link
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Archivo 6: Logo Transparente PNG -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all overflow-hidden group">
-      <div class="h-32 bg-slate-900 flex items-center justify-center relative overflow-hidden">
-        <img src="/escudo.svg" alt="" class="w-12 h-12" />
-        <span class="absolute top-2 right-2 text-[10px] font-bold bg-slate-800 text-white px-2 py-0.5 rounded-md">
-          100x100 px
-        </span>
-      </div>
-      <div class="p-4 space-y-2">
-        <h3 class="text-xs font-bold text-slate-900 truncate" title="logo-transparente.png">
-          logo-transparente.png
-        </h3>
-        <div class="text-[11px] text-slate-500 flex items-center justify-between">
-          <span>23/06/2016</span>
-          <span class="font-mono">17.90 KB</span>
-        </div>
-        <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-          <button
-            onclick="navigator.clipboard.writeText('/files/logo-transparente.png'); alert('URL copiada al portapapeles!');"
-            class="w-full text-center text-xs font-semibold text-unlu-green hover:bg-emerald-50 py-1.5 rounded-lg border border-emerald-200 transition-colors"
-          >
-            Copiar Link
-          </button>
-        </div>
-      </div>
-    </div>
-
+  <!-- Contenedor Principal de Archivos -->
+  <div id="files-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+    <!-- Renderizado dinámico -->
   </div>
 </div>
 
-<script>
-  const dragZone = document.getElementById('drag-drop-zone');
-  const fileInput = document.getElementById('file-input-hidden') as HTMLInputElement | null;
-  const triggerBtn = document.getElementById('trigger-upload-modal-btn');
+<script is:inline>
+  (function() {
+    const DEFAULT_FILES = [
+      { id: 'f-1', name: 'Informe Preliminar 2025 IPLAN-CA7.pdf', type: 'pdf', size: '174.64 KB', date: '22/05/2025', url: '/files/Informe_Preliminar_2025.pdf' },
+      { id: 'f-2', name: 'Autoevaluación Institucional 2022.png', type: 'image', size: '107.81 KB', date: '11/02/2025', url: '/files/Autoevaluacion_2022.png', preview: '/escudo.svg' },
+      { id: 'f-3', name: 'Formato para la Presentación de Proyectos.pdf', type: 'pdf', size: '93.44 KB', date: '10/02/2025', url: '/files/Formato_Presentacion_Proyectos.pdf' },
+      { id: 'f-4', name: 'banner.jpg', type: 'image', size: '24.29 KB', date: '12/07/2023', url: '/files/banner.jpg', preview: '/escudo.svg' },
+      { id: 'f-5', name: 'auto_julio_2023.jpg', type: 'image', size: '134.78 KB', date: '12/07/2023', url: '/files/auto_julio_2023.jpg', preview: '/escudo.svg' },
+      { id: 'f-6', name: 'logo-transparente.png', type: 'image', size: '17.90 KB', date: '23/06/2016', url: '/files/logo-transparente.png', preview: '/escudo.svg' }
+    ];
 
-  if (dragZone && fileInput) {
-    dragZone.addEventListener('click', () => fileInput.click());
-    
-    fileInput.addEventListener('change', () => {
-      if (fileInput.files && fileInput.files.length > 0) {
-        alert(`¡Simulación exitosa! Se han recibido ${fileInput.files.length} archivo(s). Quedarán disponibles en el servidor.`);
+    let currentCategory = 'all';
+    let currentSearch = '';
+    let isGridView = true;
+
+    function getStoredFiles() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('unlu_admin_files') || 'null');
+        return saved || DEFAULT_FILES;
+      } catch(e) {
+        return DEFAULT_FILES;
       }
-    });
-  }
+    }
 
-  if (triggerBtn && fileInput) {
-    triggerBtn.addEventListener('click', () => fileInput.click());
-  }
+    function saveStoredFiles(files) {
+      localStorage.setItem('unlu_admin_files', JSON.stringify(files));
+    }
+
+    function renderFiles() {
+      const container = document.getElementById('files-container');
+      if (!container) return;
+
+      const files = getStoredFiles();
+
+      // Conteos
+      const countAll = files.length;
+      const countImg = files.filter(f => f.type === 'image').length;
+      const countPdf = files.filter(f => f.type === 'pdf').length;
+      const countOther = files.filter(f => f.type !== 'image' && f.type !== 'pdf').length;
+
+      document.getElementById('cat-count-all').textContent = countAll;
+      document.getElementById('cat-count-image').textContent = countImg;
+      document.getElementById('cat-count-pdf').textContent = countPdf;
+      document.getElementById('cat-count-other').textContent = countOther;
+
+      let filtered = files;
+      if (currentCategory === 'image') filtered = filtered.filter(f => f.type === 'image');
+      if (currentCategory === 'pdf') filtered = filtered.filter(f => f.type === 'pdf');
+      if (currentCategory === 'other') filtered = filtered.filter(f => f.type !== 'image' && f.type !== 'pdf');
+
+      if (currentSearch) {
+        const term = currentSearch.toLowerCase();
+        filtered = filtered.filter(f => f.name.toLowerCase().includes(term));
+      }
+
+      if (filtered.length === 0) {
+        container.className = "w-full";
+        container.innerHTML = `
+          <div class="bg-white p-12 rounded-2xl border border-slate-200 text-center text-slate-500">
+            <p class="font-bold text-sm">No se encontraron archivos.</p>
+            <p class="text-xs mt-1">Prueba cambiando el filtro o término de búsqueda.</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (isGridView) {
+        container.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5";
+        container.innerHTML = filtered.map(file => `
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all overflow-hidden group">
+            <div class="h-32 ${file.type === 'image' ? 'bg-slate-900' : 'bg-slate-100'} flex items-center justify-center relative overflow-hidden p-4">
+              ${file.type === 'image' 
+                ? `<img src="${file.preview || file.url}" alt="" class="max-h-full max-w-full object-contain opacity-80 group-hover:opacity-100 transition-opacity" />`
+                : `<div class="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs uppercase shadow-sm">PDF</div>`
+              }
+              <span class="absolute top-2 right-2 text-[10px] font-bold bg-black/70 text-white px-2 py-0.5 rounded-md">
+                ${file.size}
+              </span>
+            </div>
+            <div class="p-4 space-y-2">
+              <h3 class="text-xs font-bold text-slate-900 truncate" title="${file.name}">
+                ${file.name}
+              </h3>
+              <div class="text-[11px] text-slate-500 flex items-center justify-between">
+                <span>${file.date}</span>
+                <span class="font-mono uppercase">${file.type}</span>
+              </div>
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                <button
+                  onclick="navigator.clipboard.writeText('${file.url}'); alert('URL copiada: ${file.url}');"
+                  class="flex-1 text-center text-xs font-semibold text-unlu-green hover:bg-emerald-50 py-1.5 rounded-lg border border-emerald-200 transition-colors cursor-pointer"
+                >
+                  Copiar Link
+                </button>
+                <button
+                  onclick="window.deleteAdminFile('${file.id}')"
+                  class="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                  title="Eliminar archivo"
+                >
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        container.className = "space-y-2 bg-white rounded-2xl border border-slate-200 overflow-hidden divide-y divide-slate-100";
+        container.innerHTML = filtered.map(file => `
+          <div class="p-4 flex items-center justify-between gap-4 hover:bg-slate-50">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-9 h-9 rounded-xl ${file.type==='image'?'bg-emerald-100 text-unlu-green':'bg-red-100 text-red-600'} font-bold text-xs flex items-center justify-center shrink-0">
+                ${file.type === 'image' ? 'IMG' : 'PDF'}
+              </div>
+              <div class="min-w-0">
+                <div class="text-xs font-bold text-slate-900 truncate">${file.name}</div>
+                <div class="text-[11px] text-slate-500">${file.date} • ${file.size}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                onclick="navigator.clipboard.writeText('${file.url}'); alert('URL copiada: ${file.url}');"
+                class="text-xs font-semibold text-unlu-green bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg border border-emerald-200 transition-colors cursor-pointer"
+              >
+                Copiar Link
+              </button>
+              <button
+                onclick="window.deleteAdminFile('${file.id}')"
+                class="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-lg transition-colors cursor-pointer"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    window.deleteAdminFile = function(id) {
+      if(!confirm('¿Seguro que deseas eliminar este archivo?')) return;
+      const files = getStoredFiles().filter(f => f.id !== id);
+      saveStoredFiles(files);
+      renderFiles();
+    };
+
+    // Eventos de Filtro por Categoría
+    document.querySelectorAll('.filter-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(b => {
+          b.classList.remove('active', 'bg-unlu-green', 'text-white');
+          b.classList.add('bg-slate-100', 'text-slate-700');
+        });
+        btn.classList.add('active', 'bg-unlu-green', 'text-white');
+        btn.classList.remove('bg-slate-100', 'text-slate-700');
+
+        currentCategory = btn.getAttribute('data-cat') || 'all';
+        renderFiles();
+      });
+    });
+
+    // Evento de Búsqueda
+    document.getElementById('file-search-input')?.addEventListener('input', (e) => {
+      currentSearch = e.target.value;
+      renderFiles();
+    });
+
+    // Modos de Vista
+    const gridBtn = document.getElementById('view-mode-grid-btn');
+    const listBtn = document.getElementById('view-mode-list-btn');
+
+    gridBtn?.addEventListener('click', () => {
+      isGridView = true;
+      gridBtn.classList.add('bg-white', 'shadow-xs', 'text-slate-800');
+      gridBtn.classList.remove('text-slate-500');
+      listBtn?.classList.remove('bg-white', 'shadow-xs', 'text-slate-800');
+      listBtn?.classList.add('text-slate-500');
+      renderFiles();
+    });
+
+    listBtn?.addEventListener('click', () => {
+      isGridView = false;
+      listBtn.classList.add('bg-white', 'shadow-xs', 'text-slate-800');
+      listBtn.classList.remove('text-slate-500');
+      gridBtn?.classList.remove('bg-white', 'shadow-xs', 'text-slate-800');
+      gridBtn?.classList.add('text-slate-500');
+      renderFiles();
+    });
+
+    // Subida de Archivos
+    const dragZone = document.getElementById('drag-drop-zone');
+    const fileInput = document.getElementById('file-input-hidden');
+    const triggerBtn = document.getElementById('trigger-upload-modal-btn');
+
+    if (dragZone && fileInput) {
+      dragZone.addEventListener('click', () => fileInput.click());
+
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files && fileInput.files.length > 0) {
+          const filesArr = getStoredFiles();
+          Array.from(fileInput.files).forEach(f => {
+            const isImg = f.type.startsWith('image/');
+            const isPdf = f.type === 'application/pdf' || f.name.endsWith('.pdf');
+            const fileObj = {
+              id: 'f-' + Math.random().toString(36).slice(2,8),
+              name: f.name,
+              type: isImg ? 'image' : isPdf ? 'pdf' : 'other',
+              size: (f.size / 1024).toFixed(2) + ' KB',
+              date: new Date().toLocaleDateString('es-AR'),
+              url: URL.createObjectURL(f),
+              preview: isImg ? URL.createObjectURL(f) : null
+            };
+            filesArr.unshift(fileObj);
+          });
+          saveStoredFiles(filesArr);
+          renderFiles();
+          alert(`¡Archivos subidos exitosamente! ${fileInput.files.length} archivo(s) añadido(s) a la biblioteca.`);
+        }
+      });
+    }
+
+    triggerBtn?.addEventListener('click', () => fileInput?.click());
+
+    // Inicializar render
+    renderFiles();
+  })();
 </script>

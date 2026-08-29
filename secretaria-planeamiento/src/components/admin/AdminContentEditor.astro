@@ -1,0 +1,1717 @@
+---
+/**
+ * Componente: AdminContentEditor
+ * Editor de páginas basado en el sistema de Bloques (Opción C).
+ * - Sincronizado 100% con los archivos JSON de src/data/pages.
+ * - Vista previa completa sin recortes ni truncamiento.
+ */
+import autoevaluacionData from "../../data/pages/autoevaluacion.json";
+import planDesarrolloData from "../../data/pages/plan-desarrollo.json";
+import laSecretariaData from "../../data/pages/la-secretaria.json";
+import contactoData from "../../data/pages/contacto.json";
+
+const SERVER_BASE_PAGES = {
+  autoevaluacion: autoevaluacionData,
+  "plan-desarrollo": planDesarrolloData,
+  "la-secretaria": laSecretariaData,
+  contacto: contactoData,
+};
+---
+
+<script is:inline set:html={`window.SERVER_BASE_PAGES = ${JSON.stringify(SERVER_BASE_PAGES)};`} />
+
+<div class="space-y-6" id="admin-editor-root">
+
+  <!-- Encabezado + Selector de Página -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+    <div>
+      <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
+        <a href="/admin" class="hover:text-unlu-green">Dashboard</a>
+        <span>/</span>
+        <span class="text-slate-900 font-bold">Editor de Páginas</span>
+      </div>
+      <h1 class="text-xl sm:text-2xl font-bold text-slate-900 font-sans flex items-center gap-2 flex-wrap">
+        <span>Editor de Contenido</span>
+        <span id="editing-badge" class="text-xs bg-emerald-100 text-unlu-green border border-emerald-300 font-semibold px-2.5 py-0.5 rounded-full">
+          Editando: Autoevaluación
+        </span>
+      </h1>
+    </div>
+
+    <div class="flex items-center gap-2 flex-wrap">
+      <select id="page-selector" class="bg-slate-100 border border-slate-300 text-slate-800 text-xs sm:text-sm rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-unlu-green focus:bg-white focus:outline-none transition-all">
+        <option value="autoevaluacion" selected>Autoevaluación Institucional</option>
+        <option value="plan-desarrollo">Plan de Desarrollo Institucional</option>
+        <option value="la-secretaria">La Secretaría</option>
+        <option value="contacto">Contacto</option>
+      </select>
+      <button type="button" id="reset-btn" class="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-700 border border-slate-300 hover:border-red-300 font-semibold text-xs px-3 py-2 rounded-xl transition-colors" title="Restaurar contenido original">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+        Reiniciar
+      </button>
+    </div>
+  </div>
+
+  <!-- Panel Principal: Editor de Bloques + Sidebar -->
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+    <!-- Área de Bloques (3 cols) -->
+    <div class="lg:col-span-3 space-y-5">
+
+      <!-- TARJETA EDITABLE DE CABECERA / HERO -->
+      <div class="bg-gradient-to-br from-unlu-green via-[#006834] to-unlu-green-dark text-white rounded-2xl p-5 sm:p-6 shadow-md border border-emerald-800 relative overflow-hidden">
+        <div class="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-white/15">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">⭐</span>
+            <div>
+              <h2 class="text-xs font-bold text-unlu-gold uppercase tracking-widest">Cabecera de Página (Hero Principal)</h2>
+              <p class="text-[11px] text-white/80">Título, etiqueta, subtítulo y datos de la marquesina superior</p>
+            </div>
+          </div>
+          <button type="button" onclick="openHeroEditModal()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-unlu-gold hover:bg-yellow-400 text-unlu-green-dark font-extrabold text-xs transition-all shadow-sm cursor-pointer active:scale-95">
+            ✏️ Editar Cabecera (Hero)
+          </button>
+        </div>
+
+        <!-- Vista previa fiel al Hero real de la página -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center bg-black/20 rounded-xl p-4 sm:p-5 border border-white/10">
+          <!-- Columna izquierda: Logo UNLu + Badge + Título + Subtítulo -->
+          <div>
+            <div class="flex items-center gap-3 mb-2.5">
+              <img src="/unlu-logo.svg" alt="UNLu" class="h-7 w-auto opacity-90" style="filter: brightness(0) invert(1);" />
+              <span id="hero-display-badge" class="text-xs font-bold tracking-[0.18em] uppercase text-unlu-gold">...</span>
+            </div>
+            <h1 id="hero-display-title" class="text-xl sm:text-2xl font-bold font-serif text-white leading-tight mb-2">...</h1>
+            <p id="hero-display-subtitle" class="text-xs text-white/85 leading-relaxed">...</p>
+          </div>
+
+          <!-- Columna derecha: Tarjetas de contacto (Email / Teléfono) -->
+          <div id="hero-display-contact-extras" class="hidden flex flex-col gap-2.5 self-center w-full max-w-sm ml-auto">
+            <!-- Email -->
+            <div class="flex items-center justify-between gap-3 bg-white/10 border border-white/15 rounded-xl p-3 backdrop-blur-sm">
+              <div class="flex items-start gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-lg bg-unlu-gold/20 text-unlu-gold flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+                </div>
+                <div class="min-w-0">
+                  <span class="block text-[9px] font-bold uppercase tracking-wider text-white/50">Correo</span>
+                  <span id="hero-display-email" class="block text-xs font-semibold text-white truncate">...</span>
+                </div>
+              </div>
+              <span class="shrink-0 text-[10px] font-bold bg-white/10 px-2 py-1 rounded text-white/80">Copiar</span>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="flex items-center justify-between gap-3 bg-white/10 border border-white/15 rounded-xl p-3 backdrop-blur-sm">
+              <div class="flex items-start gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-lg bg-unlu-gold/20 text-unlu-gold flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
+                </div>
+                <div class="min-w-0">
+                  <span class="block text-[9px] font-bold uppercase tracking-wider text-white/50">Teléfono</span>
+                  <span id="hero-display-phone" class="block text-xs font-semibold text-white truncate">...</span>
+                </div>
+              </div>
+              <span class="shrink-0 text-[10px] font-bold bg-white/10 px-2 py-1 rounded text-white/80">Copiar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Estado + Botón Insertar -->
+      <div class="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-slate-200 shadow-2xs">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-slate-700">Bloques en la página:</span>
+          <span id="block-count" class="bg-slate-100 text-slate-800 text-xs font-bold px-2 py-0.5 rounded-md border border-slate-200">0</span>
+        </div>
+        <button type="button" onclick="openInsertModal(null)" class="inline-flex items-center gap-1.5 bg-unlu-green hover:bg-unlu-green-dark text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-xs transition-colors cursor-pointer active:scale-95">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Insertar Bloque Prehecho
+        </button>
+      </div>
+
+      <!-- Lista de bloques actuales de la página -->
+      <div id="blocks-container" class="space-y-3 min-h-[200px]"></div>
+
+      <!-- Botón Añadir Bloque -->
+      <button
+        type="button"
+        id="add-block-btn"
+        class="w-full flex items-center justify-center gap-2 border-2 border-dashed border-slate-300 hover:border-unlu-green text-slate-500 hover:text-unlu-green bg-white hover:bg-emerald-50/30 rounded-2xl py-5 font-semibold text-sm transition-all"
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        Insertar Bloque
+      </button>
+
+      <!-- Acciones principales -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+        <div></div>
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <button type="button" id="preview-btn" class="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+            Visualizar Resultado
+          </button>
+          <button type="button" id="save-page-btn" class="inline-flex items-center gap-2 bg-unlu-green hover:bg-unlu-green-dark text-white text-sm font-bold px-6 py-2.5 rounded-xl shadow-md transition-transform active:scale-95">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            Guardar Cambios
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Información -->
+    <div class="space-y-5">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100 pb-2">Publicación</h3>
+        <div>
+          <select id="editor-status" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs font-semibold rounded-xl px-3 py-2 focus:ring-2 focus:ring-unlu-green outline-none">
+            <option value="published" selected>🟢 Publicado</option>
+            <option value="draft">🟡 Borrador</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs text-xs space-y-2">
+        <h3 class="font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100 pb-2">Estado</h3>
+        <p class="text-slate-600">Bloques en la página: <strong id="block-count" class="text-slate-900">0</strong></p>
+        <p class="text-slate-600">Última edición: <strong class="text-slate-900" id="last-edit-time">–</strong></p>
+      </div>
+
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-800">
+        <div class="flex items-start gap-2">
+          <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <div>
+            <p class="font-bold mb-1">Modo Demostración</p>
+            <p class="leading-tight">Los bloques se guardan en este navegador. La vista previa muestra el resultado real.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL DE LIBRERÍA DE BLOQUES ===== -->
+<div id="block-library-modal" class="fixed inset-0 z-[300] hidden">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeBlockLibrary()"></div>
+  <div class="relative z-10 flex h-full items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Librería de Bloques</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Seleccioná el tipo de bloque que querés insertar</p>
+        </div>
+        <button onclick="closeBlockLibrary()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <!-- Grilla de bloques disponibles -->
+      <div id="block-library-grid" class="p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL DE PREVISUALIZACIÓN EN GRANDE DE BLOQUE ===== -->
+<div id="block-preview-modal" class="fixed inset-0 z-[400] hidden">
+  <div class="absolute inset-0 bg-black/65 backdrop-blur-sm" onclick="closeBlockPreviewModal()"></div>
+  <div class="relative z-10 flex h-full items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div class="flex items-center gap-3">
+          <span id="preview-modal-icon" class="text-2xl">📦</span>
+          <div>
+            <h3 id="preview-modal-title" class="text-base font-bold text-slate-900">Vista Previa del Bloque</h3>
+            <p id="preview-modal-desc" class="text-xs text-slate-500">Muestra fiel del diseño en tamaño real</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="preview-modal-insert-btn" class="px-4 py-2 text-xs font-bold text-white bg-unlu-green hover:bg-emerald-700 rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer">
+            ➕ Insertar en la Página
+          </button>
+          <button type="button" onclick="closeBlockPreviewModal()" class="p-2 rounded-xl hover:bg-slate-200 text-slate-500 transition-all cursor-pointer" title="Cerrar">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+      </div>
+      <!-- Body del Renderizado en Tamaño Real 100% con Scroll -->
+      <div class="p-6 overflow-y-auto flex-1 bg-slate-100/50">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-4 border-b border-slate-100 pb-2">Previsualización Real del Diseño (100%):</span>
+          <div id="preview-modal-body" class="w-full"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL DE EDICIÓN DE HERO / CABECERA ===== -->
+<div id="hero-edit-modal" class="fixed inset-0 z-[450] hidden">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeHeroEditModal()"></div>
+  <div class="relative z-10 flex h-full items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <span>⭐</span> Editar Cabecera de Página (Hero)
+        </h2>
+        <button onclick="closeHeroEditModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-400">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-1 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Etiqueta Superior (Badge dorado)</label>
+          <input type="text" id="input-hero-badge" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-unlu-green" placeholder="Ej: AUTOEVALUACION INSTITUCIONAL" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Título Principal (H1)</label>
+          <input type="text" id="input-hero-title" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-unlu-green" placeholder="Ej: Autoevaluación Institucional" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Subtítulo / Descripción Corta</label>
+          <textarea id="input-hero-subtitle" class="w-full border border-slate-300 rounded-xl p-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-unlu-green resize-y min-h-[90px]" placeholder="Ej: Proceso de relevamiento..."></textarea>
+        </div>
+
+        <div id="hero-contact-fields" class="hidden space-y-3 pt-3 border-t border-slate-200">
+          <p class="text-xs font-bold text-unlu-green">Datos de Contacto Directo en la Cabecera:</p>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Correo Electrónico Oficial</label>
+            <input type="email" id="input-hero-email" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-800" placeholder="planeamiento@unlu.edu.ar" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Teléfono Central e Anexo</label>
+            <input type="text" id="input-hero-phone" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-800" placeholder="+54 (02323) 445100 · Interno 1200" />
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6 border-t border-slate-100 flex gap-3">
+        <button onclick="closeHeroEditModal()" class="flex-1 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50">Cancelar</button>
+        <button onclick="confirmHeroEdit()" class="flex-1 py-2.5 rounded-xl bg-unlu-green text-white font-bold text-sm hover:bg-unlu-green-dark shadow-xs">Guardar Cabecera</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL DE EDICIÓN DE BLOQUE ===== -->
+<div id="block-edit-modal" class="fixed inset-0 z-[400] hidden">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeBlockEdit()"></div>
+  <div class="relative z-10 flex h-full items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+        <h2 id="block-edit-title" class="text-lg font-bold text-slate-900">Editar Bloque</h2>
+        <button onclick="closeBlockEdit()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-400">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div id="block-edit-fields" class="p-6 overflow-y-auto flex-1 space-y-4"></div>
+      <div class="p-6 border-t border-slate-100 flex gap-3">
+        <button onclick="closeBlockEdit()" class="flex-1 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50">Cancelar</button>
+        <button id="block-edit-confirm" class="flex-1 py-2.5 rounded-xl bg-unlu-green text-white font-bold text-sm hover:bg-unlu-green-dark">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL VISTA PREVIA ===== -->
+<div id="preview-modal" class="fixed inset-0 z-[200] hidden">
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closePreviewModal()"></div>
+  <div class="relative h-full w-full flex flex-col">
+    <div class="bg-slate-900 text-white px-6 py-3.5 flex items-center justify-between gap-4 shrink-0 border-b border-slate-700 z-10">
+      <div class="flex items-center gap-3">
+        <div class="flex gap-1.5">
+          <span class="w-3 h-3 rounded-full bg-red-500"></span>
+          <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+          <span class="w-3 h-3 rounded-full bg-green-500"></span>
+        </div>
+        <span class="text-sm font-bold">Vista Previa Real —</span>
+        <span class="text-xs text-slate-400 font-mono" id="preview-url-label">secplaneamiento.unlu.edu.ar/autoevaluacion</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">No publicado aún</span>
+        <button onclick="closePreviewModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-auto bg-white">
+      <!-- Mini-Navbar Simulada -->
+      <div class="bg-unlu-green-dark py-2.5 px-6 flex items-center justify-between text-white text-xs" style="background-color:#005c2e;">
+        <span class="font-bold">Secretaría de Planeamiento · UNLu</span>
+        <div class="flex gap-4 text-emerald-200 text-xs">
+          <span>La Secretaría</span>
+          <span class="text-yellow-300 font-bold" id="preview-menu-label">Autoevaluación</span>
+          <span>Plan de Desarrollo</span>
+          <span>Contacto</span>
+        </div>
+      </div>
+      <div class="flex h-0.5 w-full"><div class="h-full flex-1" style="background:#008541;"></div><div class="h-full flex-1" style="background:#C8A951;"></div><div class="h-full flex-1" style="background:#c0392b;"></div></div>
+
+      <!-- Hero simulado -->
+      <div id="preview-hero" class="text-white py-10 px-6" style="background:linear-gradient(to right,#008541,#005c2e);">
+        <p class="text-xs font-bold tracking-widest uppercase mb-2" style="color:#C8A951;" id="preview-hero-badge"></p>
+        <h1 class="text-2xl font-bold font-serif mb-2" id="preview-hero-title"></h1>
+        <p class="text-sm opacity-90 max-w-2xl" id="preview-hero-subtitle"></p>
+      </div>
+
+      <!-- Contenido generado por bloques -->
+      <div class="max-w-5xl mx-auto px-6 py-8 pb-16">
+        <div id="preview-blocks-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Guardado -->
+<div id="toast-save" class="fixed bottom-6 right-6 bg-slate-900 text-white border-2 border-emerald-500 px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 opacity-0 translate-y-8 pointer-events-none transition-all duration-300 z-50">
+  <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+  </div>
+  <div>
+    <h4 class="text-sm font-bold">¡Cambios guardados!</h4>
+    <p class="text-xs text-slate-300">Usá "Visualizar Resultado" para ver el resultado final.</p>
+  </div>
+</div>
+
+<!-- Toast Reset -->
+<div id="toast-reset" class="fixed bottom-6 right-6 bg-slate-900 text-white border-2 border-amber-400 px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 opacity-0 translate-y-8 pointer-events-none transition-all duration-300 z-50">
+  <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+  </div>
+  <div><h4 class="text-sm font-bold">Contenido restaurado</h4></div>
+</div>
+
+<script is:inline>
+// =========================================================
+// BLOCK REGISTRY (Client-side mirror del block-registry.js)
+// IMPORTANTE: Esta es la copia del lado del cliente.
+// Cuando se añade un bloque al registry del servidor, se debe
+// añadir también aquí para que el editor lo refleje.
+// =========================================================
+// Helper interno para renderizar children (bloques anidados)
+function renderChildren(children) {
+  if (!Array.isArray(children) || children.length === 0) return '';
+  return children.map(child => renderBlockHtml(child)).join('\n');
+}
+
+const CLIENT_BLOCK_REGISTRY = [
+  {
+    id: "titulo-bloque", name: "Título / Subtítulo", category: "estructura", icon: "🔤",
+    description: "Bloque de título o subtítulo de sección.",
+    fields: [
+      { key: "texto", label: "Texto del título", type: "text", placeholder: "Escribí el título aquí..." },
+      { key: "nivel", label: "Nivel de encabezado", type: "select", options: [{label: "Título H2", value: "h2"}, {label: "Subtítulo H3", value: "h3"}] }
+    ],
+    render(p) {
+      const tag = p.nivel === 'h3' ? 'h3' : 'h2';
+      const size = p.nivel === 'h3' ? 'font-size:1.25rem;' : 'font-size:1.5rem;';
+      return `<${tag} style="${size}font-weight:700;color:#111827;font-family:Georgia,serif;margin:1.5rem 0 0.75rem;">${p.texto||''}</${tag}>`;
+    }
+  },
+  {
+    id: "texto-rico", name: "Párrafo de Texto", category: "estructura", icon: "📝",
+    description: "Párrafo de texto enriquecido con formato estilo Word.",
+    fields: [
+      { key: "contenido", label: "Contenido del párrafo", type: "wysiwyg", placeholder: "Escribí tu párrafo aquí..." }
+    ],
+    render(p) {
+      return `<div style="color:#374151;line-height:1.8;font-size:0.9375rem;margin-bottom:1.5rem;">${p.contenido||''}</div>`;
+    }
+  },
+  {
+    id: "lista-puntos", name: "Lista de Puntos", category: "estructura", icon: "📋",
+    description: "Lista de elementos o viñetas.",
+    fields: [
+      { key: "items", label: "Elementos de la lista (uno por línea)", type: "textarea", placeholder: "Elemento 1\nElemento 2\nElemento 3" }
+    ],
+    render(p) {
+      const itemsText = p.items || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.\nSed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\nUt enim ad minim veniam, quis nostrud exercitation ullamco.';
+      const lines = itemsText.split('\n').filter(l => l.trim() !== '');
+      const listItems = lines.map(item => `<li style="margin-bottom:0.5rem;">${item}</li>`).join('');
+      return `<ul style="list-style-type:disc;padding-left:1.5rem;color:#374151;line-height:1.75;margin-bottom:1.5rem;">${listItems}</ul>`;
+    }
+  },
+  {
+    id: "cta-banner", name: "Banner de Documento", category: "prehechos", icon: "📄",
+    description: "Banner de enlace a documentos con estilo configurable (blanco o verde, tarjeta o botón).",
+    fields: [
+      { key: "etiqueta",   label: "Etiqueta superior",   type: "text", default: "DOCUMENTO PRINCIPAL" },
+      { key: "titulo",    label: "Título del documento", type: "text", placeholder: "Haga click aquí para acceder al Informe..." },
+      { key: "url",       label: "Enlace de destino",   type: "url",  placeholder: "https://drive.google.com/..." },
+      { key: "estilo",    label: "Color de fondo",      type: "select", options: [{label: "🟢 Verde Institucional (Texto Blanco + Botón Dorado)", value: "verde"}, {label: "🤍 Blanco / Claro (Texto Verde + Icono Rojo)", value: "blanco"}] },
+      { key: "tipoBoton", label: "Tipo de enlace",      type: "select", options: [{label: "🔘 Botón a la derecha", value: "boton"}, {label: "🔗 Toda la tarjeta es clickeable", value: "tarjeta"}] },
+      { key: "textoBoton",label: "Texto del botón",     type: "text", default: "Acceder" },
+    ],
+    render(p) {
+      const estilo = p.estilo || (p.colorFondo === 'blanco' ? 'blanco' : 'verde');
+      const tipoBoton = p.tipoBoton || (p.esClickeableCompleto ? 'tarjeta' : 'boton');
+      const titulo = p.titulo || p.text || '';
+      const url = p.url || '#';
+
+      if (estilo === 'blanco') {
+        if (tipoBoton === 'boton') {
+          return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="display:block;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #008541;border-radius:0.5rem;padding:1.25rem 1.75rem;text-decoration:none;margin-bottom:1.5rem;box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;">
+    <div>
+      ${p.etiqueta ? `<span style="display:block;font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#b07d2c;margin-bottom:0.25rem;">${p.etiqueta}</span>` : ''}
+      <h3 style="font-size:1.0625rem;font-weight:700;color:#008541;font-family:Georgia,serif;margin:0;">${titulo}</h3>
+    </div>
+    <span style="display:inline-flex;align-items:center;gap:0.375rem;padding:0.625rem 1rem;border-radius:0.5rem;font-weight:700;font-size:0.8125rem;background-color:#008541;color:white;white-space:nowrap;flex-shrink:0;">
+      ${p.textoBoton || 'Ver Documento'} →
+    </span>
+  </div>
+</a>`;
+        }
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="display:block;background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.5rem;padding:1.25rem;text-decoration:none;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);transition:all 0.2s;">
+  <div style="display:flex;align-items:center;gap:0.75rem;">
+    <svg style="width:1.25rem;height:1.25rem;flex-shrink:0;color:#dc2626;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+    <div>
+      ${p.etiqueta ? `<span style="display:block;font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#b07d2c;margin-bottom:0.15rem;">${p.etiqueta}</span>` : ''}
+      <span style="font-weight:700;font-size:0.9375rem;color:#008541;">${titulo}</span>
+    </div>
+  </div>
+</a>`;
+      }
+
+      if (tipoBoton === 'tarjeta') {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="display:block;background-color:#008541;color:white;border-radius:0.5rem;padding:1.5rem 2rem;border-left:4px solid #f9c540;text-decoration:none;margin-bottom:2rem;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <div style="color:#f9c540;flex-shrink:0;">
+      <svg style="width:1.75rem;height:1.75rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+    </div>
+    <div>
+      ${p.etiqueta ? `<span style="display:block;font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#f9c540;margin-bottom:0.25rem;">${p.etiqueta}</span>` : ''}
+      <h3 style="font-size:1.125rem;font-weight:700;color:white;font-family:Georgia,serif;margin:0;">${titulo}</h3>
+    </div>
+  </div>
+</a>`;
+      }
+
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="display:block;background-color:#008541;color:white;border-radius:0.5rem;padding:1.5rem 2rem;border-left:4px solid #f9c540;text-decoration:none;margin-bottom:2rem;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.5rem;">
+    <div style="display:flex;align-items:flex-start;gap:1rem;">
+      <div style="color:#f9c540;flex-shrink:0;margin-top:4px;">
+        <svg style="width:2rem;height:2rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 01-2-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+      </div>
+      <div>
+        <span style="display:block;font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#f9c540;margin-bottom:0.25rem;">${p.etiqueta || 'DOCUMENTO PRINCIPAL'}</span>
+        <h3 style="font-size:1.25rem;font-weight:700;color:white;font-family:Georgia,serif;margin:0;line-height:1.3;">${titulo}</h3>
+      </div>
+    </div>
+    <span style="display:inline-flex;align-items:center;gap:0.375rem;padding:0.75rem 1.25rem;border-radius:0.5rem;font-weight:700;font-size:0.875rem;background-color:#f9c540;color:#1a1a1a;white-space:nowrap;flex-shrink:0;">
+      ${p.textoBoton || 'Acceder'}
+      <svg style="width:1rem;height:1rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+    </span>
+  </div>
+</a>`;
+    }
+  },
+  {
+    id: "seccion-badge", name: "Sección de Contenido", category: "estructura", icon: "🟧",
+    description: "Tarjeta blanca institucional con badge, título y editor enriquecido estilo Word para escribir texto, negritas, listas y enlaces.",
+    fields: [
+      { key: "badge",     label: "Etiqueta (badge superior)", type: "text", placeholder: "PROCESO" },
+      { key: "titulo",    label: "Título de la sección",       type: "text", placeholder: "Proceso de Autoevaluación Institucional" },
+      { key: "contenido", label: "Cuerpo de la sección (Editor estilo Word)", type: "wysiwyg", placeholder: "Escribí o pegá tu contenido acá..." },
+    ],
+    render(p, block) {
+      let bodyHtml = p.contenido || '';
+      if (block && Array.isArray(block.children) && block.children.length > 0) {
+        bodyHtml = block.children.map(child => renderBlockHtml(child)).join('\n');
+      } else if (Array.isArray(p.children) && p.children.length > 0) {
+        bodyHtml = p.children.map(child => renderBlockHtml(child)).join('\n');
+      }
+      return `<div style="background:white;border-radius:0.75rem;border:1px solid #e2e8f0;padding:2rem 2.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:2rem;">
+  ${(p.badge || p.titulo) ? `<div style="margin-bottom:1.5rem;">
+    ${p.badge ? `<span style="display:inline-block;font-size:0.75rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#b07d2c;margin-bottom:0.25rem;">${p.badge}</span>` : ''}
+    ${p.titulo ? `<h2 style="font-size:1.5rem;font-weight:700;color:#111827;font-family:Georgia,serif;margin:0 0 0.5rem;line-height:1.25;">${p.titulo}</h2>` : ''}
+    <div style="height:3px;background:linear-gradient(to right,#008541,#f9c540,#c0392b);width:9rem;"></div>
+  </div>` : ''}
+  <div style="color:#374151;line-height:1.8;font-size:0.9375rem;">${bodyHtml}</div>
+</div>`;
+    }
+  },
+  {
+    id: "grilla-medios", name: "Grilla de Medios / Entrevistas", category: "prehechos", icon: "🎬",
+    description: "Grilla de videos YouTube, SoundCloud o tarjetas de enlace. Permite agregar/editar tarjetas visualmente.",
+    fields: [
+      { key: "badge",       label: "Etiqueta superior",        type: "text",  default: "COMUNICACIÓN" },
+      { key: "titulo",      label: "Título de la sección",     type: "text",  placeholder: "Entrevistas" },
+      { key: "descripcion", label: "Descripción introductoria",type: "text",  placeholder: "A continuación..." },
+      { key: "items",       label: "Medios de la grilla",      type: "media-items" },
+    ],
+    render(p) {
+      let items = []; try { items = JSON.parse(p.items||'[]'); } catch(e) { items=[]; }
+      const cards = items.map(item => {
+        if(item.tipo==='youtube') return `<div style="background:white;border-radius:0.75rem;overflow:hidden;border:1px solid #e5e7eb;"><div style="position:relative;padding-bottom:56.25%;background:#000;"><iframe style="position:absolute;inset:0;width:100%;height:100%;" src="https://www.youtube.com/embed/${item.id}" title="${item.titulo||''}" frameborder="0" allowfullscreen></iframe></div><div style="padding:0.75rem 1rem;background:#f9fafb;border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;"><span style="font-weight:700;font-size:0.75rem;color:#1f2937;">${item.titulo||''}</span><a href="https://www.youtube.com/watch?v=${item.id}" target="_blank" style="font-size:0.75rem;font-weight:700;color:#c0392b;background:rgba(192,57,43,0.1);padding:0.375rem 0.75rem;border-radius:0.5rem;text-decoration:none;">Enlace ↗</a></div></div>`;
+        if(item.tipo==='soundcloud') return `<div style="background:white;border-radius:0.75rem;overflow:hidden;border:1px solid #e5e7eb;"><div style="height:10rem;background:#f8fafc;display:flex;align-items:center;padding:1rem;"><iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(item.url||'')}&color=%23008541&auto_play=false&hide_related=true&show_comments=false"></iframe></div><div style="padding:0.75rem 1rem;background:#f9fafb;border-top:1px solid #f1f5f9;"><span style="font-weight:700;font-size:0.75rem;color:#1f2937;">${item.titulo||''}</span></div></div>`;
+        return `<a href="${item.url||'#'}" target="_blank" style="display:block;background:white;border-radius:0.75rem;border:1px solid #e5e7eb;text-decoration:none;"><div style="height:10rem;background:#f8fafc;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.5rem;"><span style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#1d4ed8;background:#eff6ff;padding:0.25rem 0.75rem;border-radius:9999px;margin-bottom:0.5rem;">${item.plataforma||'Enlace'}</span><strong style="font-size:0.875rem;color:#1f2937;font-family:Georgia,serif;">${item.titulo||''}</strong></div><div style="padding:0.75rem 1rem;background:#f9fafb;border-top:1px solid #f1f5f9;"><span style="font-weight:700;font-size:0.75rem;color:#1f2937;">${item.titulo||''}</span></div></a>`;
+      }).join('');
+      return `<section style="margin-bottom:3rem;"><div style="margin-bottom:1.5rem;"><span style="display:inline-block;font-size:0.75rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#b07d2c;margin-bottom:0.5rem;">${p.badge||''}</span><h2 style="font-size:1.5rem;font-weight:700;color:#111827;font-family:Georgia,serif;margin:0 0 0.5rem;">${p.titulo||''}</h2><div style="height:3px;background:linear-gradient(to right,#008541,#f9c540,#c0392b);width:9rem;"></div></div>${p.descripcion?`<p style="color:#4b5563;margin-bottom:2rem;line-height:1.75;">${p.descripcion}</p>`:''}<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;">${cards}</div></section>`;
+    }
+  },
+  {
+    id: "link-card", name: "Tarjeta / Banner de Link", category: "prehechos", icon: "🔗",
+    description: "Tarjeta gris de enlace externo.",
+    fields: [
+      { key: "text", label: "Texto del enlace", type: "text", placeholder: "Ver análisis de respuestas..." },
+      { key: "url",  label: "URL de destino",   type: "url",  placeholder: "https://drive.google.com/..." },
+    ],
+    render(p) { return `<a href="${p.url||'#'}" target="_blank" rel="noopener noreferrer" style="display:block;background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.5rem;padding:1.25rem;text-decoration:none;margin-bottom:1.5rem;"><div style="display:flex;align-items:center;gap:0.75rem;"><svg style="width:1.25rem;height:1.25rem;flex-shrink:0;color:#dc2626;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg><span style="font-weight:700;font-size:0.9375rem;color:#008541;">${p.text||''}</span></div></a>`; }
+  },
+  {
+    id: "card-atencion-mapa", name: "Tarjeta de Atención al Público y Mapa", category: "prehechos", icon: "🗺️",
+    description: "Tarjeta verde institucional con horario de atención al público, botón de mapa y teaser del mapa del campus.",
+    fields: [
+      { key: "badge",       label: "Etiqueta superior",        type: "text",     default: "ATENCIÓN AL PÚBLICO" },
+      { key: "horario",     label: "Horario de Atención",       type: "text",     default: "Lunes a viernes · 8:00 a 16:00 hs." },
+      { key: "descripcion", label: "Descripción / Detalles",    type: "textarea", default: "Consultas presenciales y recepción de documentación en Mesa de Entradas del Rectorado. La Secretaría de Planeamiento se ubica en el Edificio 8 — Rectorado." },
+      { key: "urlMapa",     label: "URL de Google Maps",        type: "url",      default: "https://maps.app.goo.gl/LiaPfuTYbCt3FMuU6" },
+      { key: "imagenMapa",  label: "Ruta de la imagen del mapa",type: "text",     default: "/mapa-unlu.png" }
+    ],
+    render(p) {
+      const urlMapa = p.urlMapa || 'https://maps.app.goo.gl/LiaPfuTYbCt3FMuU6';
+      const imagenMapa = p.imagenMapa || '/mapa-unlu.png';
+      const badge = p.badge || 'ATENCIÓN AL PÚBLICO';
+      const horario = p.horario || 'Lunes a viernes - 8:00 a 16:00 hs.';
+      const descripcion = p.descripcion || 'Consultas presenciales y recepción de documentación en Mesa de Entradas del Rectorado.';
+
+      return `<div class="card-atencion-mapa-container" data-expanded="false" style="background-color:#008541;border-radius:0.75rem;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.12);margin-bottom:2.5rem;color:white;">
+  <!-- CABECERA -->
+  <div style="display:flex;flex-wrap:wrap;align-items:stretch;background-color:#008541;">
+    <div style="background-color:#005c2e;display:flex;align-items:center;justify-content:center;padding:1.5rem 1.75rem;flex-shrink:0;">
+      <svg style="width:2.5rem;height:2.5rem;color:#f9c540;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    </div>
+    <div style="padding:1.25rem 1.75rem;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.25rem;flex:1;">
+      <div>
+        <span style="display:block;font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.18em;color:#f9c540;margin-bottom:0.15rem;">${badge}</span>
+        <h3 style="font-size:1.125rem;font-weight:700;color:white;margin:0 0 0.25rem;">${horario}</h3>
+        <p style="font-size:0.8125rem;color:rgba(255,255,255,0.85);margin:0;max-width:34rem;">${descripcion}</p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;">
+        <a href="${urlMapa}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:0.375rem;background-color:#f9c540;color:#1a1a1a;font-weight:700;font-size:0.8125rem;padding:0.5rem 1rem;border-radius:0.5rem;text-decoration:none;white-space:nowrap;">
+          <svg style="width:0.875rem;height:0.875rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span>Cómo llegar</span>
+        </a>
+        <button type="button" onclick="toggleMapExpand(this)" style="display:inline-flex;align-items:center;gap:0.375rem;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.25);color:white;font-weight:600;font-size:0.8125rem;padding:0.5rem 1rem;border-radius:0.5rem;cursor:pointer;white-space:nowrap;transition:all 0.2s;">
+          <svg style="width:0.875rem;height:0.875rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+          <span class="map-btn-text">Ver mapa</span>
+          <svg class="map-btn-arrow" style="width:0.75rem;height:0.75rem;transition:transform 0.2s;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRITA TEASER COLAPSADA -->
+  <div class="map-teaser-bar" onclick="toggleMapExpandFromTeaser(this)" style="position:relative;height:3rem;background:#005c2e;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+    <img src="${imagenMapa}" alt="Teaser mapa" style="position:absolute;inset:0;width:100%;height:12rem;object-fit:cover;object-position:top;opacity:0.3;filter:blur(1px);margin-top:-2.5rem;" />
+    <div style="position:relative;z-index:10;display:flex;align-items:center;gap:0.5rem;color:#f9c540;font-size:0.6875rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;">
+      <svg style="width:0.75rem;height:0.75rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+      <span>VER MAPA DEL CAMPUS</span>
+      <svg style="width:0.75rem;height:0.75rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+  </div>
+
+  <!-- PANEL MAPA EXPANDIDO -->
+  <div class="map-expanded-panel" style="display:none;background:#ffffff;padding:1.25rem;border-top:1px solid rgba(255,255,255,0.1);">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;background-color:#005c2e;padding:0.75rem 1.25rem;border-radius:0.5rem;margin-bottom:1rem;color:white;font-size:0.8125rem;">
+      <span>La Secretaría de Planeamiento se ubica en el <strong>edificio 8 — Rectorado</strong>, Dpto. Cs. Básicas, Dpto. Tecnología y Secretarías.</span>
+      <span style="background-color:#f9c540;color:#1a1a1a;font-weight:800;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.75rem;white-space:nowrap;display:inline-flex;align-items:center;gap:0.375rem;">
+        <span style="background:#1a1a1a;color:#f9c540;width:1.125rem;height:1.125rem;border-radius:9999px;display:inline-flex;align-items:center;justify-content:center;font-size:0.625rem;font-weight:900;">8</span>
+        <span>Secretaría de Planeamiento</span>
+      </span>
+    </div>
+    <div style="position:relative;border-radius:0.75rem;overflow:hidden;border:1px solid #cbd5e1;background:#f8fafc;padding:0.5rem;">
+      <img src="${imagenMapa}" alt="Mapa del Campus UNLu" style="width:100%;height:auto;display:block;border-radius:0.5rem;" />
+      <div style="position:absolute;bottom:1.5rem;right:1.5rem;background-color:#008541;color:white;font-weight:800;font-size:0.75rem;padding:0.5rem 1rem;border-radius:9999px;box-shadow:0 4px 10px rgba(0,0,0,0.2);display:flex;align-items:center;gap:0.375rem;">
+        <span style="background:#f9c540;color:#008541;width:1.25rem;height:1.25rem;border-radius:9999px;display:inline-flex;align-items:center;justify-content:center;font-size:0.6875rem;font-weight:900;">8</span>
+        <span>Aquí nos encontrás</span>
+      </div>
+    </div>
+  </div>
+</div>`;
+    }
+  },
+  {
+    id: "card-formulario-contacto", name: "Formulario de Consulta", category: "prehechos", icon: "✉️",
+    description: "Tarjeta blanca con encabezado y formulario de mensajes de consulta a la Secretaría.",
+    fields: [
+      { key: "titulo",    label: "Título principal",  type: "text", default: "Envianos tu consulta" },
+      { key: "subtitulo", label: "Texto descriptivo", type: "text", default: "¿Necesitás realizar una consulta o comunicarte con la Secretaría de Planeamiento? Podés hacerlo a través de nuestro formulario de contacto." }
+    ],
+    render(p) {
+      return `<div style="background:white;border-radius:1rem;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:2.5rem;">
+  <div style="background:linear-gradient(to right, #f8fafc, white);padding:1.5rem 2rem;border-bottom:1px solid #f1f5f9;">
+    <h2 style="font-size:1.25rem;font-weight:700;color:#111827;font-family:Georgia,serif;margin:0 0 0.25rem;">${p.titulo||'Envianos tu consulta'}</h2>
+    <p style="font-size:0.875rem;color:#4b5563;margin:0;">${p.subtitulo||''}</p>
+  </div>
+  <div style="padding:2rem;">
+    <div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:0.75rem;padding:2rem;text-align:center;color:#64748b;">
+      <svg style="width:2.5rem;height:2.5rem;margin:0 auto 0.5rem;color:#008541;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      <strong style="display:block;color:#1f2937;font-size:1rem;margin-bottom:0.25rem;">Formulario de Consulta Integrado</strong>
+      <span style="font-size:0.8125rem;">Formulario interactivo con envío de mensajes, validación de correo y contador de caracteres.</span>
+    </div>
+  </div>
+</div>`;
+    }
+  },
+  {
+    id: "separator", name: "Separador de Sección", category: "estructura", icon: "—",
+    description: "Divisor decorativo de puntos entre secciones.",
+    fields: [],
+    render() { return `<div style="text-align:center;color:#cbd5e1;letter-spacing:0.35em;font-size:0.75rem;user-select:none;margin:2rem 0;">.................................................................................</div>`; }
+  }
+];
+
+window.toggleMapExpand = function(btn) {
+  const container = btn.closest('.card-atencion-mapa-container');
+  if (!container) return;
+  const teaserBar = container.querySelector('.map-teaser-bar');
+  const expandedPanel = container.querySelector('.map-expanded-panel');
+  const btnText = container.querySelector('.map-btn-text');
+  const isExpanded = container.getAttribute('data-expanded') === 'true';
+
+  if (isExpanded) {
+    container.setAttribute('data-expanded', 'false');
+    if (teaserBar) teaserBar.style.display = 'flex';
+    if (expandedPanel) expandedPanel.style.display = 'none';
+    if (btnText) btnText.textContent = '🗺️ Ver mapa ˅';
+    btn.style.background = 'rgba(255,255,255,0.12)';
+    btn.style.borderColor = 'rgba(255,255,255,0.3)';
+  } else {
+    container.setAttribute('data-expanded', 'true');
+    if (teaserBar) teaserBar.style.display = 'none';
+    if (expandedPanel) expandedPanel.style.display = 'block';
+    if (btnText) btnText.textContent = '🗺️ Ocultar mapa ˄';
+    btn.style.background = 'rgba(255,255,255,0.25)';
+    btn.style.borderColor = 'rgba(255,255,255,0.6)';
+  }
+};
+
+window.toggleMapExpandFromTeaser = function(teaserEl) {
+  const container = teaserEl.closest('.card-atencion-mapa-container');
+  if (!container) return;
+  const btn = container.querySelector('button[onclick*="toggleMapExpand"]');
+  if (btn) toggleMapExpand(btn);
+};
+
+function getBlockDef(id) { return CLIENT_BLOCK_REGISTRY.find(b=>b.id===id); }
+function renderBlockHtml(block) {
+  const def = getBlockDef(block.type);
+  if(!def) return `<div style="background:#fef2f2;border:1px dashed #fca5a5;padding:1rem;border-radius:0.5rem;color:#dc2626;">Bloque desconocido: ${block.type}</div>`;
+  return def.render(block.props||{}, block);
+}
+
+
+// =========================================================
+// DATOS BASE (Sincronizados 100% con los JSON del servidor)
+// =========================================================
+const BASE_PAGES = window.SERVER_BASE_PAGES || {};
+
+// =========================================================
+// ESTADO GLOBAL DEL EDITOR
+// =========================================================
+const LS_KEY = 'unlu_blocks_v30';
+let currentPageKey = 'autoevaluacion';
+let currentMeta = {};
+let currentBlocks = [];
+let editingBlockIndex = null;
+let editingChildContext = null;
+let currentInsertTargetParent = null;
+
+function getSavedPages() { try { return JSON.parse(localStorage.getItem(LS_KEY)||'{}'); } catch(e) { return {}; } }
+function savePages(data) { localStorage.setItem(LS_KEY, JSON.stringify(data)); }
+
+function getPageData(key) {
+  const saved = getSavedPages();
+  if (saved[key]) {
+    const data = saved[key];
+    if (data.meta && Array.isArray(data.blocks)) return JSON.parse(JSON.stringify(data));
+    if (Array.isArray(data)) {
+      const base = BASE_PAGES[key] || {};
+      return { meta: JSON.parse(JSON.stringify(base.meta || {})), blocks: JSON.parse(JSON.stringify(data)) };
+    }
+  }
+  const base = BASE_PAGES[key];
+  return base ? JSON.parse(JSON.stringify(base)) : { meta: {}, blocks: [] };
+}
+
+function generateId() { return 'blk-' + Math.random().toString(36).slice(2,9); }
+
+function renderHeroDisplay() {
+  const badgeEl = document.getElementById('hero-display-badge');
+  const titleEl = document.getElementById('hero-display-title');
+  const subtitleEl = document.getElementById('hero-display-subtitle');
+  const contactExtras = document.getElementById('hero-display-contact-extras');
+  const emailEl = document.getElementById('hero-display-email');
+  const phoneEl = document.getElementById('hero-display-phone');
+
+  if (badgeEl) badgeEl.textContent = currentMeta.heroBadge || '';
+  if (titleEl) titleEl.textContent = currentMeta.heroTitle || '';
+  if (subtitleEl) subtitleEl.textContent = currentMeta.heroSubtitle || '';
+
+  if (currentPageKey === 'contacto' || currentMeta.email || currentMeta.telefono) {
+    if (contactExtras) contactExtras.classList.remove('hidden');
+    if (emailEl) emailEl.textContent = currentMeta.email || 'planeamiento@unlu.edu.ar';
+    if (phoneEl) phoneEl.textContent = (currentMeta.telefono || '+54 (02323) 445100') + (currentMeta.interno ? ' (' + currentMeta.interno + ')' : '');
+  } else {
+    if (contactExtras) contactExtras.classList.add('hidden');
+  }
+}
+
+function openHeroEditModal() {
+  document.getElementById('input-hero-badge').value = currentMeta.heroBadge || '';
+  document.getElementById('input-hero-title').value = currentMeta.heroTitle || '';
+  document.getElementById('input-hero-subtitle').value = currentMeta.heroSubtitle || '';
+
+  const contactFields = document.getElementById('hero-contact-fields');
+  if (currentPageKey === 'contacto') {
+    contactFields.classList.remove('hidden');
+    document.getElementById('input-hero-email').value = currentMeta.email || 'planeamiento@unlu.edu.ar';
+    document.getElementById('input-hero-phone').value = currentMeta.telefono || '+54 (02323) 445100';
+  } else {
+    contactFields.classList.add('hidden');
+  }
+
+  document.getElementById('hero-edit-modal').classList.remove('hidden');
+}
+
+function closeHeroEditModal() {
+  document.getElementById('hero-edit-modal').classList.add('hidden');
+}
+
+function confirmHeroEdit() {
+  currentMeta.heroBadge = document.getElementById('input-hero-badge').value;
+  currentMeta.heroTitle = document.getElementById('input-hero-title').value;
+  currentMeta.heroSubtitle = document.getElementById('input-hero-subtitle').value;
+
+  if (currentPageKey === 'contacto') {
+    currentMeta.email = document.getElementById('input-hero-email').value;
+    currentMeta.telefono = document.getElementById('input-hero-phone').value;
+  }
+
+  const badge = document.getElementById('editing-badge');
+  if (badge) badge.textContent = 'Editando: ' + (currentMeta.heroTitle || currentPageKey);
+
+  renderHeroDisplay();
+  closeHeroEditModal();
+}
+
+// =========================================================
+// RENDERIZAR LISTA DE BLOQUES EN EL EDITOR
+// =========================================================
+function updateBlockProp(idx, key, val) {
+  if(!currentBlocks[idx]) return;
+  if(!currentBlocks[idx].props) currentBlocks[idx].props = {};
+  currentBlocks[idx].props[key] = val;
+}
+
+window.execInlineCmd = function(editorId, blockIdx, fieldKey, cmd, value = null) {
+  const editor = document.getElementById(editorId);
+  if(!editor) return;
+  editor.focus();
+
+  if(cmd === 'toggleGreen') {
+    const sel = window.getSelection();
+    if(sel && sel.rangeCount > 0) {
+      const parent = sel.anchorNode?.parentElement;
+      const isGreen = parent && (
+        parent.style.color === 'rgb(0, 133, 65)' ||
+        parent.style.color === '#008541' ||
+        parent.getAttribute('color') === '#008541'
+      );
+      if(isGreen) {
+        document.execCommand('removeFormat', false, null);
+        document.execCommand('foreColor', false, '#374151');
+      } else {
+        document.execCommand('foreColor', false, '#008541');
+      }
+    } else {
+      document.execCommand('foreColor', false, '#008541');
+    }
+  } else if(cmd === 'createLink') {
+    const url = prompt('Ingrese la URL del enlace (ej: https://...):', 'https://');
+    if(url) document.execCommand('createLink', false, url);
+  } else {
+    document.execCommand(cmd, false, value);
+  }
+
+  updateBlockProp(blockIdx, fieldKey, editor.innerHTML);
+};
+
+window.updateChildProp = function(parentIdx, childIdx, key, val) {
+  if (!currentBlocks[parentIdx]?.children?.[childIdx]) return;
+  if (!currentBlocks[parentIdx].children[childIdx].props) currentBlocks[parentIdx].children[childIdx].props = {};
+  currentBlocks[parentIdx].children[childIdx].props[key] = val;
+};
+
+window.execChildCmd = function(editorId, parentIdx, childIdx, key, cmd, value = null) {
+  const editor = document.getElementById(editorId);
+  if (!editor) return;
+  editor.focus();
+
+  if (cmd === 'toggleGreen') {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const parent = sel.anchorNode?.parentElement;
+      const isGreen = parent && (
+        parent.style.color === 'rgb(0, 133, 65)' ||
+        parent.style.color === '#008541' ||
+        parent.getAttribute('color') === '#008541'
+      );
+      if (isGreen) {
+        document.execCommand('removeFormat', false, null);
+        document.execCommand('foreColor', false, '#374151');
+      } else {
+        document.execCommand('foreColor', false, '#008541');
+      }
+    } else {
+      document.execCommand('foreColor', false, '#008541');
+    }
+  } else if (cmd === 'createLink') {
+    const url = prompt('Ingrese la URL del enlace (ej: https://...):', 'https://');
+    if (url) document.execCommand('createLink', false, url);
+  } else {
+    document.execCommand(cmd, false, value);
+  }
+
+  updateChildProp(parentIdx, childIdx, key, editor.innerHTML);
+};
+
+window.addChildSubBlock = function(parentIdx, type) {
+  if (!currentBlocks[parentIdx].children) currentBlocks[parentIdx].children = [];
+  const newChild = {
+    id: generateId(),
+    type: type,
+    props: {}
+  };
+  if (type === 'texto-rico') newChild.props.contenido = '<p>Nuevo párrafo de texto...</p>';
+  if (type === 'titulo-bloque') { newChild.props.texto = 'Nuevo Título'; newChild.props.nivel = 'h2'; }
+  if (type === 'lista-puntos') newChild.props.items = 'Elemento 1\nElemento 2';
+  if (type === 'link-card') { newChild.props.text = 'Concluimos el análisis de las encuestas realizadas y lo compartimos'; newChild.props.url = '#'; }
+  if (type === 'cta-banner') { newChild.props.etiqueta = 'DOCUMENTO'; newChild.props.titulo = 'Título del documento'; newChild.props.url = '#'; newChild.props.textoBoton = 'Acceder'; }
+
+  currentBlocks[parentIdx].children.push(newChild);
+  renderBlockList();
+};
+
+window.moveChildSubBlock = function(parentIdx, childIdx, dir) {
+  const children = currentBlocks[parentIdx].children;
+  if (!children) return;
+  const newIdx = childIdx + dir;
+  if (newIdx < 0 || newIdx >= children.length) return;
+  const tmp = children[childIdx];
+  children[childIdx] = children[newIdx];
+  children[newIdx] = tmp;
+  renderBlockList();
+};
+
+window.deleteChildSubBlock = function(parentIdx, childIdx) {
+  if (!confirm('¿Eliminar este bloque interno?')) return;
+  currentBlocks[parentIdx].children.splice(childIdx, 1);
+  renderBlockList();
+};
+
+function renderInlineFieldsForBlock(block, idx) {
+  const def = getBlockDef(block.type);
+  if(!def || !def.fields || def.fields.length === 0) return '';
+  const props = block.props || {};
+
+  // Campos superiores del bloque principal
+  const fieldsHtml = def.fields.map(field => {
+    // Si la sección tiene sub-bloques, omitir el campo genérico "contenido" único
+    if (block.type === 'seccion-badge' && field.key === 'contenido' && Array.isArray(block.children) && block.children.length > 0) {
+      return '';
+    }
+
+    const val = props[field.key] !== undefined ? props[field.key] : (field.default||'');
+    const fieldId = `inline-field-${idx}-${field.key}`;
+
+    if(field.type === 'wysiwyg' || field.type === 'richtext') {
+      return `<div class="space-y-1.5 mt-3">
+        <label class="block text-xs font-bold text-slate-700">${field.label}</label>
+        <div class="border border-slate-300 rounded-2xl overflow-hidden bg-white shadow-2xs">
+          <!-- BARRA WORD EN LÍNEA EN LA TARJETA -->
+          <div class="flex flex-wrap items-center gap-1 px-3 py-2 bg-slate-100 border-b border-slate-200 text-slate-700 select-none">
+            <button type="button" onmousedown="event.preventDefault()" onclick="execInlineCmd('${fieldId}', ${idx}, '${field.key}', 'bold')" class="px-2.5 py-1 rounded-lg hover:bg-slate-200 font-bold text-xs cursor-pointer active:scale-95" title="Negrita (Ctrl+B)">B</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execInlineCmd('${fieldId}', ${idx}, '${field.key}', 'italic')" class="px-2.5 py-1 rounded-lg hover:bg-slate-200 italic font-serif text-xs cursor-pointer active:scale-95" title="Cursiva (Ctrl+I)">I</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execInlineCmd('${fieldId}', ${idx}, '${field.key}', 'underline')" class="px-2.5 py-1 rounded-lg hover:bg-slate-200 underline text-xs cursor-pointer active:scale-95" title="Subrayado (Ctrl+U)">U</button>
+            <div class="h-4 w-px bg-slate-300 mx-1"></div>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execInlineCmd('${fieldId}', ${idx}, '${field.key}', 'formatBlock', '<h3>')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs font-bold text-slate-800 cursor-pointer active:scale-95" title="Título H2">H2</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execInlineCmd('${fieldId}', ${idx}, '${field.key}', 'formatBlock', '<h4>')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs font-bold text-slate-600 cursor-pointer active:scale-95" title="Subtítulo H3">H3</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execInlineCmd('${fieldId}', ${idx}, '${field.key}', 'formatBlock', '<p>')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs text-slate-600 cursor-pointer active:scale-95" title="Párrafo normal">Párrafo</button>
+            <div class="h-4 w-px bg-slate-300 mx-1"></div>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execInlineCmd('${fieldId}', ${idx}, '${field.key}', 'insertUnorderedList')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs font-bold cursor-pointer active:scale-95" title="Lista con viñetas">• Lista</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execInlineCmd('${fieldId}', ${idx}, '${field.key}', 'insertOrderedList')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs font-bold cursor-pointer active:scale-95" title="Lista numerada">1. Lista</button>
+            <div class="h-4 w-px bg-slate-300 mx-1"></div>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execInlineCmd('${fieldId}', ${idx}, '${field.key}', 'toggleGreen')" class="px-2 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-unlu-green font-bold text-xs flex items-center gap-1 cursor-pointer active:scale-95" title="Activar/Desactivar Texto Verde">✨ Texto Verde</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execInlineCmd('${fieldId}', ${idx}, '${field.key}', 'createLink')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs font-bold text-blue-700 cursor-pointer active:scale-95" title="Insertar Enlace">🔗 Enlace</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execInlineCmd('${fieldId}', ${idx}, '${field.key}', 'removeFormat')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs text-slate-400 cursor-pointer active:scale-95" title="Limpiar formato">🧹 Limpiar</button>
+          </div>
+          <!-- ÁREA CONTENTEDITABLE EN LÍNEA -->
+          <div id="${fieldId}" contenteditable="true" oninput="updateBlockProp(${idx}, '${field.key}', this.innerHTML)" class="p-4 min-h-[160px] text-sm leading-relaxed text-slate-800 focus:outline-none bg-white">${val}</div>
+        </div>
+      </div>`;
+    }
+
+    if(field.type === 'textarea') {
+      return `<div class="space-y-1 mt-3">
+        <label class="block text-xs font-bold text-slate-700">${field.label}</label>
+        <textarea oninput="updateBlockProp(${idx}, '${field.key}', this.value)" class="w-full border border-slate-300 rounded-xl p-3 text-xs font-sans text-slate-800 focus:outline-none focus:ring-2 focus:ring-unlu-green resize-y min-h-[100px]" placeholder="${field.placeholder||''}">${val}</textarea>
+      </div>`;
+    }
+
+    if(field.type === 'select') {
+      const opts = (field.options||[]).map(o => `<option value="${o.value}" ${val===o.value?'selected':''}>${o.label}</option>`).join('');
+      return `<div class="space-y-1 mt-3">
+        <label class="block text-xs font-bold text-slate-700">${field.label}</label>
+        <select onchange="updateBlockProp(${idx}, '${field.key}', this.value)" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-unlu-green bg-white">${opts}</select>
+      </div>`;
+    }
+
+    return `<div class="space-y-1 mt-3">
+      <label class="block text-xs font-bold text-slate-700">${field.label}</label>
+      <input type="${field.type||'text'}" value="${(val+'').replace(/"/g,'&quot;')}" oninput="updateBlockProp(${idx}, '${field.key}', this.value)" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-unlu-green" placeholder="${field.placeholder||''}" />
+    </div>`;
+  }).join('');
+
+  // Sub-bloques hijos para Secciones
+  let childrenHtml = '';
+  const children = block.children || [];
+  if (block.type === 'seccion-badge' || children.length > 0) {
+    childrenHtml = `<div class="mt-4 pt-4 border-t border-slate-200 space-y-3">
+      <div class="flex items-center justify-between">
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Sub-bloques de Contenido (${children.length})</label>
+      </div>
+      <div class="space-y-3">
+        ${children.map((child, cIdx) => {
+          const cDef = getBlockDef(child.type);
+          const cIcon = cDef ? cDef.icon : '📌';
+          const cName = cDef ? cDef.name : child.type;
+          const cProps = child.props || {};
+          const childFieldId = `child-field-${idx}-${cIdx}`;
+
+          let childInputHtml = '';
+          if (child.type === 'texto-rico' || cDef?.fields?.some(f=>f.type==='wysiwyg')) {
+            const contentVal = cProps.contenido || '';
+            childInputHtml = `<div class="border border-slate-300 rounded-xl overflow-hidden bg-white mt-2 shadow-2xs">
+              <div class="flex flex-wrap items-center gap-1 px-2.5 py-1.5 bg-slate-100 border-b border-slate-200 text-slate-700 select-none">
+                <button type="button" onmousedown="event.preventDefault()" onclick="execChildCmd('${childFieldId}', ${idx}, ${cIdx}, 'contenido', 'bold')" class="px-2 py-0.5 rounded font-bold text-xs hover:bg-slate-200">B</button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="execChildCmd('${childFieldId}', ${idx}, ${cIdx}, 'contenido', 'italic')" class="px-2 py-0.5 rounded italic font-serif text-xs hover:bg-slate-200">I</button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="execChildCmd('${childFieldId}', ${idx}, ${cIdx}, 'contenido', 'underline')" class="px-2 py-0.5 rounded underline text-xs hover:bg-slate-200">U</button>
+                <div class="h-3.5 w-px bg-slate-300 mx-1"></div>
+                <button type="button" onmousedown="event.preventDefault()" onclick="execChildCmd('${childFieldId}', ${idx}, ${cIdx}, 'contenido', 'insertUnorderedList')" class="px-2 py-0.5 rounded font-bold text-xs hover:bg-slate-200">• Lista</button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="execChildCmd('${childFieldId}', ${idx}, ${cIdx}, 'contenido', 'insertOrderedList')" class="px-2 py-0.5 rounded font-bold text-xs hover:bg-slate-200">1. Lista</button>
+                <div class="h-3.5 w-px bg-slate-300 mx-1"></div>
+                <button type="button" onmousedown="event.preventDefault()" onclick="execChildCmd('${childFieldId}', ${idx}, ${cIdx}, 'contenido', 'toggleGreen')" class="px-2 py-0.5 rounded bg-emerald-100 text-unlu-green font-bold text-xs hover:bg-emerald-200">✨ Texto Verde</button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="execChildCmd('${childFieldId}', ${idx}, ${cIdx}, 'contenido', 'createLink')" class="px-2 py-0.5 rounded text-blue-700 font-bold text-xs hover:bg-slate-200">🔗 Enlace</button>
+              </div>
+              <div id="${childFieldId}" contenteditable="true" oninput="updateChildProp(${idx}, ${cIdx}, 'contenido', this.innerHTML)" class="p-3 min-h-[100px] text-xs leading-relaxed text-slate-800 focus:outline-none bg-white">${contentVal}</div>
+            </div>`;
+          } else if (child.type === 'titulo-bloque') {
+            childInputHtml = `<div class="grid grid-cols-1 sm:grid-cols-4 gap-2 mt-2">
+              <input type="text" value="${(cProps.texto||'').replace(/"/g,'&quot;')}" oninput="updateChildProp(${idx}, ${cIdx}, 'texto', this.value)" placeholder="Texto del título..." class="sm:col-span-3 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-unlu-green" />
+              <select onchange="updateChildProp(${idx}, ${cIdx}, 'nivel', this.value)" class="border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-800 bg-white">
+                <option value="h2" ${cProps.nivel!=='h3'?'selected':''}>Título H2</option>
+                <option value="h3" ${cProps.nivel==='h3'?'selected':''}>Subtítulo H3</option>
+              </select>
+            </div>`;
+          } else if (child.type === 'lista-puntos') {
+            childInputHtml = `<div class="mt-2">
+              <textarea oninput="updateChildProp(${idx}, ${cIdx}, 'items', this.value)" placeholder="Un elemento por línea..." class="w-full border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-unlu-green min-h-[80px]">${cProps.items||''}</textarea>
+            </div>`;
+          } else if (child.type === 'link-card') {
+            childInputHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+              <input type="text" value="${(cProps.text||'').replace(/"/g,'&quot;')}" oninput="updateChildProp(${idx}, ${cIdx}, 'text', this.value)" placeholder="Texto del enlace..." class="sm:col-span-2 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-unlu-green" />
+              <input type="url" value="${(cProps.url||'').replace(/"/g,'&quot;')}" oninput="updateChildProp(${idx}, ${cIdx}, 'url', this.value)" placeholder="URL..." class="sm:col-span-2 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-unlu-green" />
+            </div>`;
+          } else if (child.type === 'cta-banner') {
+            childInputHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+              <input type="text" value="${(cProps.etiqueta||'').replace(/"/g,'&quot;')}" oninput="updateChildProp(${idx}, ${cIdx}, 'etiqueta', this.value)" placeholder="Etiqueta..." class="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs" />
+              <input type="text" value="${(cProps.textoBoton||'').replace(/"/g,'&quot;')}" oninput="updateChildProp(${idx}, ${cIdx}, 'textoBoton', this.value)" placeholder="Texto botón..." class="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs" />
+              <input type="text" value="${(cProps.titulo||'').replace(/"/g,'&quot;')}" oninput="updateChildProp(${idx}, ${cIdx}, 'titulo', this.value)" placeholder="Título..." class="sm:col-span-2 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs" />
+              <input type="url" value="${(cProps.url||'').replace(/"/g,'&quot;')}" oninput="updateChildProp(${idx}, ${cIdx}, 'url', this.value)" placeholder="URL..." class="sm:col-span-2 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs" />
+            </div>`;
+          }
+
+          return `<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 relative group/child">
+            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs">${cIcon}</span>
+                <span class="text-xs font-bold text-slate-700">${cName}</span>
+                <span class="text-[10px] text-slate-400 font-mono">#${cIdx+1}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                ${cIdx > 0 ? `<button type="button" onclick="moveChildSubBlock(${idx}, ${cIdx}, -1)" class="p-1 text-slate-500 hover:text-slate-800 text-xs font-bold" title="Subir">↑</button>` : ''}
+                ${cIdx < children.length-1 ? `<button type="button" onclick="moveChildSubBlock(${idx}, ${cIdx}, 1)" class="p-1 text-slate-500 hover:text-slate-800 text-xs font-bold" title="Bajar">↓</button>` : ''}
+                <button type="button" onclick="deleteChildSubBlock(${idx}, ${cIdx})" class="p-1 text-slate-400 hover:text-red-600 text-xs" title="Eliminar">🗑️</button>
+              </div>
+            </div>
+            ${childInputHtml}
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div class="pt-2 flex flex-wrap items-center gap-2">
+        <span class="text-xs font-bold text-slate-600">➕ Agregar bloque interno:</span>
+        <button type="button" onclick="addChildSubBlock(${idx}, 'texto-rico')" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-unlu-green font-bold text-xs border border-emerald-200 transition-all">📝 Párrafo Word</button>
+        <button type="button" onclick="addChildSubBlock(${idx}, 'titulo-bloque')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-all">🔤 Título / Subtítulo</button>
+        <button type="button" onclick="addChildSubBlock(${idx}, 'lista-puntos')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-all">📋 Lista</button>
+        <button type="button" onclick="addChildSubBlock(${idx}, 'link-card')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-all">🔗 Tarjeta Enlace</button>
+        <button type="button" onclick="addChildSubBlock(${idx}, 'cta-banner')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-all">📄 Banner Documento</button>
+      </div>
+    </div>`;
+  }
+
+  return fieldsHtml + childrenHtml;
+}
+
+window.toggleBlockPreview = function(idx) {
+  const fieldsBox = document.getElementById(`block-editor-fields-${idx}`);
+  const previewBox = document.getElementById(`block-preview-box-${idx}`);
+  const previewContent = document.getElementById(`block-preview-content-${idx}`);
+  const toggleBtn = document.getElementById(`preview-toggle-btn-${idx}`);
+  const toggleText = document.getElementById(`preview-toggle-text-${idx}`);
+
+  if(!fieldsBox || !previewBox || !previewContent) return;
+
+  const isPreviewing = !previewBox.classList.contains('hidden');
+
+  if(isPreviewing) {
+    previewBox.classList.add('hidden');
+    fieldsBox.classList.remove('hidden');
+    if(toggleText) toggleText.textContent = 'Vista previa';
+    if(toggleBtn) {
+      toggleBtn.classList.remove('bg-emerald-600', 'text-white', 'border-emerald-600');
+      toggleBtn.classList.add('bg-slate-100', 'text-slate-700', 'border-slate-200');
+    }
+  } else {
+    const block = currentBlocks[idx];
+    previewContent.innerHTML = renderBlockHtml(block);
+    fieldsBox.classList.add('hidden');
+    previewBox.classList.remove('hidden');
+    if(toggleText) toggleText.textContent = 'Volver a editar';
+    if(toggleBtn) {
+      toggleBtn.classList.remove('bg-slate-100', 'text-slate-700', 'border-slate-200');
+      toggleBtn.classList.add('bg-emerald-600', 'text-white', 'border-emerald-600');
+    }
+  }
+};
+
+// =========================================================
+// RENDERIZAR LISTA DE BLOQUES EN EL EDITOR (EDICIÓN EN LÍNEA)
+// =========================================================
+function renderBlockList() {
+  const container = document.getElementById('blocks-container');
+  const countEl = document.getElementById('block-count');
+  if(!container) return;
+  if(countEl) countEl.textContent = currentBlocks.length;
+
+  if(currentBlocks.length === 0) {
+    container.innerHTML = `<div class="flex flex-col items-center justify-center py-14 text-slate-400 bg-white rounded-2xl border-2 border-dashed border-slate-200">
+      <svg class="w-12 h-12 mb-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 01-2-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" /></svg>
+      <p class="font-semibold text-sm">Esta página no tiene bloques todavía</p>
+      <p class="text-xs mt-1">Usá el botón "Insertar Bloque" para comenzar</p>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = currentBlocks.map((block, idx) => {
+    const def = getBlockDef(block.type);
+    const icon = def ? def.icon : '❓';
+    const name = def ? def.name : block.type;
+    const inlineFields = renderInlineFieldsForBlock(block, idx);
+
+    return `<div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs group hover:border-unlu-green/50 hover:shadow-sm transition-all p-5 space-y-3" data-block-index="${idx}">
+      <!-- Cabecera del bloque con controles de estructura y ojo de vista previa -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 bg-slate-50/80 -mx-5 -mt-5 px-5 pt-3.5 mb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">${icon}</span>
+          <div>
+            <h3 class="text-xs font-bold text-slate-800">${name}</h3>
+            <span class="text-[10px] text-slate-400 font-mono">Bloque #${idx+1}</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button type="button" onclick="toggleBlockPreview(${idx})" id="preview-toggle-btn-${idx}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 font-bold text-xs border border-slate-200 transition-all cursor-pointer active:scale-95" title="Ver cómo queda este bloque">
+            👁️ <span id="preview-toggle-text-${idx}">Vista previa</span>
+          </button>
+          ${idx > 0 ? `<button type="button" onclick="moveBlock(${idx}, -1)" class="p-1.5 rounded-lg hover:bg-slate-200 text-slate-600 font-bold transition-colors" title="Subir bloque">↑</button>` : ''}
+          ${idx < currentBlocks.length-1 ? `<button type="button" onclick="moveBlock(${idx}, 1)" class="p-1.5 rounded-lg hover:bg-slate-200 text-slate-600 font-bold transition-colors" title="Bajar bloque">↓</button>` : ''}
+          <button type="button" onclick="duplicateBlock(${idx})" class="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition-colors" title="Duplicar bloque">📋</button>
+          <button type="button" onclick="deleteBlock(${idx})" class="p-1.5 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-600 transition-colors" title="Eliminar bloque">🗑️</button>
+        </div>
+      </div>
+      <!-- Edición directa en la tarjeta del lienzo -->
+      <div id="block-editor-fields-${idx}" class="inline-block-fields">${inlineFields}</div>
+
+      <!-- CAJA DE VISTA PREVIA INDIVIDUAL (Revelada con el emoji de ojo 👁️) -->
+      <div id="block-preview-box-${idx}" class="hidden mt-2 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+        <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-200">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1">👁️ Vista Previa del Bloque #${idx+1}</span>
+          <span class="text-[10px] text-slate-400">Así se verá exactamente en la página pública</span>
+        </div>
+        <div id="block-preview-content-${idx}" class="bg-white p-4 rounded-xl shadow-2xs border border-slate-100"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// =========================================================
+// OPERACIONES SOBRE BLOQUES Y BLOQUES HIJOS
+// =========================================================
+function moveBlock(idx, dir) {
+  const newIdx = idx + dir;
+  if(newIdx < 0 || newIdx >= currentBlocks.length) return;
+  const tmp = currentBlocks[idx];
+  currentBlocks[idx] = currentBlocks[newIdx];
+  currentBlocks[newIdx] = tmp;
+  renderBlockList();
+}
+
+function deleteBlock(idx) {
+  if(!confirm('¿Eliminar este bloque?')) return;
+  currentBlocks.splice(idx, 1);
+  renderBlockList();
+}
+
+function duplicateBlock(idx) {
+  const copy = JSON.parse(JSON.stringify(currentBlocks[idx]));
+  copy.id = generateId();
+  currentBlocks.splice(idx+1, 0, copy);
+  renderBlockList();
+}
+
+function moveChildBlock(parentIdx, childIdx, dir) {
+  const children = currentBlocks[parentIdx].children || [];
+  const newIdx = childIdx + dir;
+  if(newIdx < 0 || newIdx >= children.length) return;
+  const tmp = children[childIdx];
+  children[childIdx] = children[newIdx];
+  children[newIdx] = tmp;
+  renderBlockList();
+}
+
+function deleteChildBlock(parentIdx, childIdx) {
+  if(!confirm('¿Eliminar este elemento de la sección?')) return;
+  currentBlocks[parentIdx].children.splice(childIdx, 1);
+  renderBlockList();
+}
+
+function duplicateChildBlock(parentIdx, childIdx) {
+  const children = currentBlocks[parentIdx].children || [];
+  const copy = JSON.parse(JSON.stringify(children[childIdx]));
+  copy.id = generateId();
+  children.splice(childIdx + 1, 0, copy);
+  renderBlockList();
+}
+
+function openChildBlockEdit(parentIdx, childIdx) {
+  editingBlockIndex = parentIdx;
+  editingChildContext = { parentIdx, childIdx };
+  const child = currentBlocks[parentIdx].children[childIdx];
+  const def = getBlockDef(child.type);
+  if(!def) return;
+
+  const titleEl = document.getElementById('block-edit-title');
+  const fieldsEl = document.getElementById('block-edit-fields');
+  if(titleEl) titleEl.textContent = `✏️ Editar Elemento: ${def.name}`;
+
+  renderFieldsForBlock(def, child.props, fieldsEl);
+  document.getElementById('block-edit-modal').classList.remove('hidden');
+}
+
+function openInsertChildModal(parentIdx) {
+  currentInsertTargetParent = parentIdx;
+  openBlockLibrary();
+}
+
+// =========================================================
+// LIBRERÍA DE BLOQUES (seleccionar tipo para insertar con vista previa)
+// =========================================================
+function getLibrarySamplePreview(def) {
+  const sampleProps = {};
+  if (def.fields) {
+    def.fields.forEach(f => {
+      sampleProps[f.key] = f.default || f.placeholder || (f.key === 'titulo' ? def.name : '');
+    });
+  }
+  if (def.id === 'link-card') {
+    sampleProps.text = 'Enlace de ejemplo a documento o sitio externo';
+    sampleProps.url = '#';
+  }
+  if (def.id === 'cta-banner') {
+    sampleProps.etiqueta = 'ETIQUETA DE DOCUMENTO';
+    sampleProps.titulo = 'Título del documento o informe de ejemplo';
+    sampleProps.url = '#';
+    sampleProps.estilo = 'verde';
+    sampleProps.tipoBoton = 'boton';
+    sampleProps.textoBoton = 'Ver Documento';
+  }
+  if (def.id === 'titulo-bloque') {
+    sampleProps.texto = 'Título de Sección de Ejemplo (H2 / H3)';
+    sampleProps.nivel = 'h2';
+  }
+  if (def.id === 'texto-rico') {
+    sampleProps.contenido = '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. <strong>Texto en negrita</strong> de ejemplo.</p>';
+  }
+  if (def.id === 'lista-puntos') {
+    sampleProps.items = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.\nSed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\nUt enim ad minim veniam, quis nostrud exercitation ullamco.';
+  }
+  if (def.id === 'seccion-badge') {
+    sampleProps.badge = 'ETIQUETA DE SECCIÓN';
+    sampleProps.titulo = 'Título de la Sección de Contenido';
+    sampleProps.contenido = '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>';
+  }
+  if (def.id === 'media-grid') {
+    sampleProps.badge = 'COMUNICACIÓN';
+    sampleProps.titulo = 'Medios / Entrevistas';
+    sampleProps.items = JSON.stringify([{ tipo: 'youtube', id: 'dQw4w9WgXcQ', titulo: 'Entrevista institucional' }]);
+  }
+  if (def.id === 'card-atencion-mapa') {
+    sampleProps.badge = 'ATENCIÓN AL PÚBLICO';
+    sampleProps.horario = 'Lunes a viernes · 8:00 a 16:00 hs.';
+    sampleProps.descripcion = 'Consultas presenciales en Mesa de Entradas.';
+  }
+  if (def.id === 'card-formulario-contacto') {
+    sampleProps.badge = 'DEJANOS TU CONSULTA';
+    sampleProps.titulo = 'Formulario Directo de Atención';
+  }
+  if (def.id === 'separador') {
+    return '<div style="text-align:center;padding:0.75rem 0;color:#008541;font-weight:bold;">• • • • •</div>';
+  }
+
+  try {
+    return def.render(sampleProps, { children: [] });
+  } catch(e) {
+    return `<div class="p-2 text-slate-400 text-xs">${def.description}</div>`;
+  }
+}
+
+window.showBlockPreviewModal = function(typeId) {
+  const def = getBlockDef(typeId);
+  if (!def) return;
+
+  const iconEl = document.getElementById('preview-modal-icon');
+  const titleEl = document.getElementById('preview-modal-title');
+  const descEl = document.getElementById('preview-modal-desc');
+  const bodyEl = document.getElementById('preview-modal-body');
+  const insertBtn = document.getElementById('preview-modal-insert-btn');
+
+  if (iconEl) iconEl.textContent = def.icon || '📦';
+  if (titleEl) titleEl.textContent = def.name;
+  if (descEl) descEl.textContent = def.description;
+
+  if (insertBtn) {
+    insertBtn.onclick = function() {
+      closeBlockPreviewModal();
+      insertNewBlock(typeId);
+    };
+  }
+
+  const sampleHtml = getLibrarySamplePreview(def);
+  if (bodyEl) bodyEl.innerHTML = sampleHtml;
+
+  const modal = document.getElementById('block-preview-modal');
+  if (modal) modal.classList.remove('hidden');
+};
+
+window.closeBlockPreviewModal = function() {
+  const modal = document.getElementById('block-preview-modal');
+  if (modal) modal.classList.add('hidden');
+};
+
+function openBlockLibrary() {
+  const grid = document.getElementById('block-library-grid');
+  if(!grid) return;
+
+  const modalTitle = document.querySelector('#block-library-modal h2');
+  const modalDesc = document.querySelector('#block-library-modal p');
+
+  let blocksToDisplay = CLIENT_BLOCK_REGISTRY;
+  if (currentInsertTargetParent !== null) {
+    const parentName = currentBlocks[currentInsertTargetParent]?.props?.titulo || 'Sección';
+    if(modalTitle) modalTitle.textContent = `➕ Agregar Elemento Interno`;
+    if(modalDesc) modalDesc.textContent = `Insertando dentro de: "${parentName}"`;
+    blocksToDisplay = CLIENT_BLOCK_REGISTRY.filter(b => b.category === 'elementos' || !b.isContainer);
+  } else {
+    if(modalTitle) modalTitle.textContent = `Librería de Bloques`;
+    if(modalDesc) modalDesc.textContent = `Seleccioná el tipo de bloque que querés insertar en la página`;
+  }
+
+  grid.innerHTML = blocksToDisplay.map(def => {
+    return `<div class="bg-slate-50 hover:bg-slate-100/80 border border-slate-200 hover:border-slate-300 rounded-2xl p-4 transition-all flex items-center justify-between gap-3 group">
+      <div class="flex items-start gap-3 cursor-pointer flex-1" onclick="insertNewBlock('${def.id}')">
+        <span class="text-2xl mt-0.5">${def.icon}</span>
+        <div>
+          <p class="font-bold text-sm text-slate-900 group-hover:text-unlu-green transition-colors">${def.name}</p>
+          <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">${def.description}</p>
+        </div>
+      </div>
+      <div class="flex flex-col gap-1.5 items-end flex-shrink-0">
+        <button type="button" onclick="event.stopPropagation(); showBlockPreviewModal('${def.id}')" class="px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-200 border border-slate-300 rounded-xl transition-all flex items-center gap-1 shadow-2xs cursor-pointer">
+          👁️ Ver en grande
+        </button>
+        <button type="button" onclick="insertNewBlock('${def.id}')" class="px-3 py-1.5 text-xs font-bold text-white bg-unlu-green hover:bg-emerald-700 rounded-xl transition-all shadow-2xs cursor-pointer">
+          ➕ Insertar
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('block-library-modal').classList.remove('hidden');
+}
+
+function closeBlockLibrary() {
+  document.getElementById('block-library-modal').classList.add('hidden');
+  currentInsertTargetParent = null;
+}
+
+function insertNewBlock(typeId) {
+  const def = getBlockDef(typeId);
+  if(!def) return;
+  const defaultProps = {};
+  def.fields.forEach(f => { defaultProps[f.key] = f.default || ''; });
+  const newBlock = { id: generateId(), type: typeId, props: defaultProps };
+
+  if (currentInsertTargetParent !== null) {
+    const targetParent = currentInsertTargetParent;
+    if(!currentBlocks[targetParent].children) currentBlocks[targetParent].children = [];
+    currentBlocks[targetParent].children.push(newBlock);
+    const newChildIdx = currentBlocks[targetParent].children.length - 1;
+    currentInsertTargetParent = null;
+    closeBlockLibrary();
+    renderBlockList();
+    openChildBlockEdit(targetParent, newChildIdx);
+  } else {
+    currentBlocks.push(newBlock);
+    closeBlockLibrary();
+    renderBlockList();
+    openBlockEdit(currentBlocks.length - 1);
+  }
+}
+
+// =========================================================
+// EDITOR DE CAMPOS DE BLOQUE
+// =========================================================
+function renderFieldsForBlock(def, props, fieldsEl) {
+  if(!fieldsEl) return;
+  if(def.fields.length === 0) {
+    fieldsEl.innerHTML = '<p class="text-slate-500 text-sm text-center py-8">Este bloque no tiene campos configurables.</p>';
+    return;
+  }
+
+  fieldsEl.innerHTML = def.fields.map(field => {
+    const val = (props||{})[field.key] !== undefined ? (props||{})[field.key] : (field.default||'');
+
+    if(field.type === 'media-items') {
+      let mediaItems = [];
+      try { mediaItems = JSON.parse(val||'[]'); } catch(e) { mediaItems=[]; }
+
+      function renderMediaItemCard(item, idx) {
+        const tipo = item.tipo||'youtube';
+        const youtubeFields = tipo==='youtube' ? `
+          <div class="mt-2">
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">ID del video de YouTube</label>
+            <input type="text" data-media-key="id" value="${(item.id||'').replace(/"/g,'&quot;')}" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-unlu-green" placeholder="Ej: USB3P-5VUE8 (código en la URL ?v=)" />
+          </div>` : '';
+        const soundcloudFields = tipo==='soundcloud' ? `
+          <div class="mt-2">
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">URL completa de SoundCloud</label>
+            <input type="url" data-media-key="url" value="${(item.url||'').replace(/"/g,'&quot;')}" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-unlu-green" placeholder="https://soundcloud.com/..." />
+          </div>` : '';
+        const linkFields = (tipo==='facebook'||tipo==='link') ? `
+          <div class="mt-2">
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">URL del enlace</label>
+            <input type="url" data-media-key="url" value="${(item.url||'').replace(/"/g,'&quot;')}" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-unlu-green" placeholder="https://..." />
+          </div>
+          <div class="mt-2">
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">Plataforma</label>
+            <input type="text" data-media-key="plataforma" value="${(item.plataforma||'').replace(/"/g,'&quot;')}" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-unlu-green" placeholder="Ej: Prensa UNLu" />
+          </div>` : '';
+
+        const tipoIcons = { youtube: '▶️', soundcloud: '🎵', facebook: '🔵', link: '🔗' };
+        return `<div class="border border-slate-200 rounded-xl overflow-hidden mb-3" data-media-item-index="${idx}">
+          <div class="flex items-center justify-between px-3 py-2 bg-slate-50 border-b border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="text-sm">${tipoIcons[tipo]||'📎'}</span>
+              <select data-media-key="tipo" onchange="updateMediaItemType(${idx}, this.value)" class="text-xs font-bold text-slate-700 bg-transparent border-0 focus:outline-none cursor-pointer">
+                <option value="youtube" ${tipo==='youtube'?'selected':''}>YouTube</option>
+                <option value="soundcloud" ${tipo==='soundcloud'?'selected':''}>SoundCloud</option>
+                <option value="facebook" ${tipo==='facebook'?'selected':''}>Facebook / Red Social</option>
+                <option value="link" ${tipo==='link'?'selected':''}>Otro enlace</option>
+              </select>
+            </div>
+            <button type="button" onclick="removeMediaItem(${idx})" class="text-slate-400 hover:text-red-500 p-1 rounded transition-colors" title="Eliminar este ítem">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="p-3 space-y-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Título</label>
+              <input type="text" data-media-key="titulo" value="${(item.titulo||'').replace(/"/g,'&quot;')}" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-unlu-green" placeholder="Ej: ENTREVISTA MARIO OLORIZ" />
+            </div>
+            ${youtubeFields}${soundcloudFields}${linkFields}
+          </div>
+        </div>`;
+      }
+
+      window._mediaItemsState = JSON.parse(JSON.stringify(mediaItems));
+      window.updateMediaItemType = function(idx, newTipo) { readMediaItemsFromDOM(); window._mediaItemsState[idx].tipo = newTipo; reRenderMediaItems(); };
+      window.removeMediaItem = function(idx) { readMediaItemsFromDOM(); window._mediaItemsState.splice(idx,1); reRenderMediaItems(); };
+      window.addMediaItem = function(tipo) { readMediaItemsFromDOM(); window._mediaItemsState.push({tipo, titulo:'', id:'', url:'', plataforma:''}); reRenderMediaItems(); document.getElementById('media-add-menu')?.classList.add('hidden'); };
+      window.reRenderMediaItems = function() { const list = document.getElementById('media-items-list'); if(list) list.innerHTML = window._mediaItemsState.map((item,i) => renderMediaItemCard(item,i)).join(''); };
+      window.readMediaItemsFromDOM = function() {
+        const cards = document.querySelectorAll('[data-media-item-index]');
+        cards.forEach((card, i) => {
+          if(!window._mediaItemsState[i]) return;
+          const get = (key) => { const el = card.querySelector(`[data-media-key="${key}"]`); return el ? el.value : ''; };
+          window._mediaItemsState[i] = { tipo: get('tipo') || window._mediaItemsState[i].tipo, titulo: get('titulo'), id: get('id'), url: get('url'), plataforma: get('plataforma') };
+        });
+      };
+
+      const initialCards = mediaItems.map((item,i) => renderMediaItemCard(item,i)).join('');
+      return `<div data-field="${field.key}" data-field-type="media-items">
+        <label class="block text-xs font-bold text-slate-700 mb-2">${field.label} <span class="font-normal text-slate-400">(${mediaItems.length})</span></label>
+        <div id="media-items-list" class="space-y-0">${initialCards || '<p class="text-center text-xs text-slate-400 py-6 border border-dashed border-slate-300 rounded-xl">No hay ítems todavía.</p>'}</div>
+        <div class="mt-3 relative">
+          <button type="button" onclick="document.getElementById('media-add-menu').classList.toggle('hidden')" class="w-full flex items-center justify-center gap-2 border-2 border-dashed border-slate-300 hover:border-unlu-green text-slate-500 hover:text-unlu-green text-xs font-semibold py-2.5 rounded-xl transition-all">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Agregar ítem de medio
+          </button>
+          <div id="media-add-menu" class="hidden absolute bottom-full mb-2 left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-xl p-2 z-10">
+            <button onclick="addMediaItem('youtube')" class="flex items-center gap-2 w-full text-left text-xs font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700 px-3 py-2 rounded-lg transition-colors">▶️ Video de YouTube</button>
+            <button onclick="addMediaItem('soundcloud')" class="flex items-center gap-2 w-full text-left text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-orange-700 px-3 py-2 rounded-lg transition-colors">🎵 Audio de SoundCloud</button>
+            <button onclick="addMediaItem('facebook')" class="flex items-center gap-2 w-full text-left text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 px-3 py-2 rounded-lg transition-colors">🔵 Facebook / Red Social</button>
+            <button onclick="addMediaItem('link')" class="flex items-center gap-2 w-full text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 px-3 py-2 rounded-lg transition-colors">🔗 Otro enlace</button>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    if(field.type === 'wysiwyg' || field.type === 'richtext') {
+      window.execWysiwygCmd = function(cmd, value = null) {
+        const editor = document.getElementById(`wysiwyg-${field.key}`) || document.querySelector('[contenteditable="true"]');
+        if(editor) editor.focus();
+        document.execCommand(cmd, false, value);
+      };
+
+      return `<div data-field="${field.key}">
+        <label class="block text-xs font-bold text-slate-700 mb-1.5">${field.label}</label>
+        
+        <div class="border border-slate-300 rounded-2xl overflow-hidden bg-white shadow-2xs">
+          <!-- BARRA DE HERRAMIENTAS WORD / CKEDITOR (Con prevencion de des-foco) -->
+          <div class="flex flex-wrap items-center gap-1 px-3 py-2 bg-slate-100 border-b border-slate-200 text-slate-700 select-none">
+            <button type="button" onmousedown="event.preventDefault()" onclick="execWysiwygCmd('bold')" class="px-2.5 py-1 rounded-lg hover:bg-slate-200 font-bold text-xs cursor-pointer active:scale-95" title="Negrita (Ctrl+B)">B</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execWysiwygCmd('italic')" class="px-2.5 py-1 rounded-lg hover:bg-slate-200 italic font-serif text-xs cursor-pointer active:scale-95" title="Cursiva (Ctrl+I)">I</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execWysiwygCmd('underline')" class="px-2.5 py-1 rounded-lg hover:bg-slate-200 underline text-xs cursor-pointer active:scale-95" title="Subrayado (Ctrl+U)">U</button>
+
+            <div class="h-4 w-px bg-slate-300 mx-1"></div>
+
+            <button type="button" onmousedown="event.preventDefault()" onclick="execWysiwygCmd('formatBlock', '<h3>')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs font-bold text-slate-800 cursor-pointer active:scale-95" title="Título principal de sección">H2</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execWysiwygCmd('formatBlock', '<h4>')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs font-bold text-slate-600 cursor-pointer active:scale-95" title="Subtítulo">H3</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execWysiwygCmd('formatBlock', '<p>')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs text-slate-600 cursor-pointer active:scale-95" title="Párrafo normal">Párrafo</button>
+
+            <div class="h-4 w-px bg-slate-300 mx-1"></div>
+
+            <button type="button" onmousedown="event.preventDefault()" onclick="execWysiwygCmd('insertUnorderedList')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs font-bold cursor-pointer active:scale-95" title="Lista con viñetas">• Lista</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execWysiwygCmd('insertOrderedList')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs font-bold cursor-pointer active:scale-95" title="Lista numerada">1. Lista</button>
+
+            <div class="h-4 w-px bg-slate-300 mx-1"></div>
+
+            <button type="button" onmousedown="event.preventDefault()" onclick="execWysiwygCmd('foreColor', '#008541')" class="px-2 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-unlu-green font-bold text-xs flex items-center gap-1 cursor-pointer active:scale-95" title="Aplicar color verde institucional">
+              ✨ Texto Verde
+            </button>
+
+            <button type="button" onmousedown="event.preventDefault()" onclick="const url=prompt('Ingresá la URL del enlace:','https://'); if(url) execWysiwygCmd('createLink', url);" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs font-bold text-blue-700 cursor-pointer active:scale-95" title="Insertar Enlace">🔗 Enlace</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="execWysiwygCmd('removeFormat')" class="px-2 py-1 rounded-lg hover:bg-slate-200 text-xs text-slate-400 cursor-pointer active:scale-95" title="Borrar formato del texto seleccionado">🧹 Limpiar</button>
+          </div>
+
+          <!-- ÁREA DE EDICIÓN CON FORMATO EN VIVO -->
+          <div id="wysiwyg-${field.key}" contenteditable="true" class="p-4 min-h-[240px] max-h-[480px] overflow-y-auto text-sm leading-relaxed text-slate-800 focus:outline-none" data-field="${field.key}">${val}</div>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-1.5">💡 Seleccioná cualquier texto y hacé clic en los botones de arriba para dar formato (Negrita, Cursiva, Listas, Títulos o Enlaces).</p>
+      </div>`;
+    }
+    if(field.type === 'textarea') {
+      return `<div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">${field.label}</label>
+        <textarea data-field="${field.key}" class="w-full border border-slate-300 rounded-xl p-3 text-xs font-sans text-slate-800 focus:outline-none focus:ring-2 focus:ring-unlu-green resize-y min-h-[120px]" placeholder="${field.placeholder||''}">${val}</textarea>
+      </div>`;
+    }
+    return `<div>
+      <label class="block text-xs font-bold text-slate-700 mb-1">${field.label}</label>
+      <input type="${field.type||'text'}" data-field="${field.key}" value="${(val+'').replace(/"/g,'&quot;')}" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-unlu-green" placeholder="${field.placeholder||''}" />
+    </div>`;
+  }).join('');
+}
+
+function openBlockEdit(idx) {
+  editingBlockIndex = idx;
+  editingChildContext = null;
+  const block = currentBlocks[idx];
+  const def = getBlockDef(block.type);
+  if(!def) return;
+
+  const titleEl = document.getElementById('block-edit-title');
+  const fieldsEl = document.getElementById('block-edit-fields');
+  if(titleEl) titleEl.textContent = `✏️ Editar: ${def.name}`;
+
+  renderFieldsForBlock(def, block.props, fieldsEl);
+  document.getElementById('block-edit-modal').classList.remove('hidden');
+}
+
+function closeBlockEdit() {
+  document.getElementById('block-edit-modal').classList.add('hidden');
+  editingBlockIndex = null;
+  editingChildContext = null;
+}
+
+function confirmBlockEdit() {
+  if(editingBlockIndex === null) return;
+  const block = currentBlocks[editingBlockIndex];
+  const def = getBlockDef(block.type);
+  if(!def) return;
+
+  const fieldsEl = document.getElementById('block-edit-fields');
+  if(!fieldsEl) return;
+
+  def.fields.forEach(field => {
+    if(field.type === 'media-items') {
+      if(window.readMediaItemsFromDOM) window.readMediaItemsFromDOM();
+      const cleaned = (window._mediaItemsState||[]).map(item => {
+        const out = { tipo: item.tipo, titulo: item.titulo };
+        if(item.tipo==='youtube') { out.id = item.id; }
+        else { out.url = item.url; if(item.plataforma) out.plataforma = item.plataforma; }
+        return out;
+      });
+      block.props[field.key] = JSON.stringify(cleaned);
+    } else if(field.type === 'wysiwyg' || field.type === 'richtext') {
+      const el = document.getElementById(`wysiwyg-${field.key}`);
+      if(el) block.props[field.key] = el.innerHTML;
+    } else {
+      const el = fieldsEl.querySelector(`[data-field="${field.key}"]`);
+      if(el) block.props[field.key] = el.value;
+    }
+  });
+
+  closeBlockEdit();
+  renderBlockList();
+}
+
+// =========================================================
+// VISTA PREVIA
+// =========================================================
+function openPreviewModal() {
+  const pageBase = BASE_PAGES[currentPageKey];
+  const meta = pageBase ? pageBase.meta : {};
+
+  // Rellenar hero
+  const heroTitle = document.getElementById('preview-hero-title');
+  const heroBadge = document.getElementById('preview-hero-badge');
+  const heroSubtitle = document.getElementById('preview-hero-subtitle');
+  const previewUrl = document.getElementById('preview-url-label');
+  const previewMenu = document.getElementById('preview-menu-label');
+
+  if(heroTitle) heroTitle.textContent = meta.heroTitle || '';
+  if(heroBadge) heroBadge.textContent = meta.heroBadge || '';
+  if(heroSubtitle) heroSubtitle.textContent = meta.heroSubtitle || '';
+  if(previewUrl) previewUrl.textContent = meta.slug || '';
+  if(previewMenu) previewMenu.textContent = meta.heroTitle || '';
+
+  // Renderizar bloques
+  const content = document.getElementById('preview-blocks-content');
+  if(content) {
+    content.innerHTML = currentBlocks.map(b => renderBlockHtml(b)).join('\n');
+  }
+
+  document.getElementById('preview-modal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePreviewModal() {
+  document.getElementById('preview-modal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+// =========================================================
+// GUARDAR Y REINICIAR
+// =========================================================
+function savePage() {
+  const saved = getSavedPages();
+  saved[currentPageKey] = {
+    meta: JSON.parse(JSON.stringify(currentMeta)),
+    blocks: JSON.parse(JSON.stringify(currentBlocks))
+  };
+  savePages(saved);
+  const el = document.getElementById('last-edit-time');
+  if(el) el.textContent = 'Hoy ' + new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+  showToast('toast-save');
+}
+
+function resetPage() {
+  if(!confirm('¿Restaurar la cabecera y bloques originales de esta página? Se perderán los cambios locales.')) return;
+  const saved = getSavedPages();
+  delete saved[currentPageKey];
+  savePages(saved);
+  loadPage(currentPageKey);
+  showToast('toast-reset');
+}
+
+function loadPage(key) {
+  currentPageKey = key;
+  const pageData = getPageData(key);
+  currentMeta = pageData.meta || {};
+  currentBlocks = pageData.blocks || [];
+
+  const badge = document.getElementById('editing-badge');
+  if(badge) badge.textContent = 'Editando: ' + (currentMeta.heroTitle || key);
+
+  renderHeroDisplay();
+  renderBlockList();
+}
+
+// =========================================================
+// TOAST
+// =========================================================
+function showToast(id) {
+  document.querySelectorAll('[id^="toast-"]').forEach(t => {
+    t.classList.add('opacity-0','translate-y-8','pointer-events-none');
+    t.classList.remove('opacity-100','translate-y-0');
+  });
+  const toast = document.getElementById(id);
+  if(!toast) return;
+  toast.classList.remove('opacity-0','translate-y-8','pointer-events-none');
+  toast.classList.add('opacity-100','translate-y-0');
+  setTimeout(() => {
+    toast.classList.add('opacity-0','translate-y-8','pointer-events-none');
+    toast.classList.remove('opacity-100','translate-y-0');
+  }, 4000);
+}
+
+// =========================================================
+// INICIALIZACIÓN
+// =========================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const pageParam = urlParams.get('page');
+  if(pageParam && BASE_PAGES[pageParam]) {
+    const sel = document.getElementById('page-selector');
+    if(sel) sel.value = pageParam;
+    currentPageKey = pageParam;
+  }
+  loadPage(currentPageKey);
+
+  document.getElementById('page-selector')?.addEventListener('change', e => loadPage(e.target.value));
+  document.getElementById('add-block-btn')?.addEventListener('click', openBlockLibrary);
+  document.getElementById('save-page-btn')?.addEventListener('click', savePage);
+  document.getElementById('reset-btn')?.addEventListener('click', resetPage);
+  document.getElementById('preview-btn')?.addEventListener('click', openPreviewModal);
+  document.getElementById('block-edit-confirm')?.addEventListener('click', confirmBlockEdit);
+  document.addEventListener('keydown', e => { if(e.key==='Escape') { closePreviewModal(); closeBlockLibrary(); closeBlockEdit(); } });
+});
+</script>

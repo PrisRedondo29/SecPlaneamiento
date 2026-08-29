@@ -1,0 +1,98 @@
+{
+  "pageId": "autoevaluacion",
+  "meta": {
+    "title": "Autoevaluación Institucional · Secretaría de Planeamiento UNLu",
+    "activeSection": "autoevaluacion",
+    "heroTitle": "Autoevaluación Institucional",
+    "heroBadge": "AUTOEVALUACION INSTITUCIONAL",
+    "heroSubtitle": "Proceso de relevamiento, análisis de claustros e informes de autoevaluación de la Universidad Nacional de Luján."
+  },
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "cta-banner",
+      "props": {
+        "etiqueta": "DOCUMENTO PRINCIPAL",
+        "titulo": "Haga click aquí para acceder al Informe de la Autoevaluación Institucional",
+        "url": "https://drive.google.com/file/d/16iDGIcW67kV6GQcTB2XCJ1nAfPY4EOC-/view",
+        "textoBoton": "Acceder"
+      }
+    },
+    {
+      "id": "block-2",
+      "type": "seccion-badge",
+      "props": {
+        "badge": "PROCESO",
+        "titulo": "Proceso de Autoevaluación Institucional"
+      },
+      "children": [
+        {
+          "id": "sub-2-1",
+          "type": "texto-rico",
+          "props": {
+            "contenido": "<p>En la UNLu, estamos llevando a cabo el proceso de autoevaluación institucional.</p><p>Preparamos una serie de encuestas para escuchar a la comunidad universitaria y ayudar a autoevaluarnos. Para cada uno de los roles con los que participa una persona, hay una encuesta específica.</p>"
+          }
+        },
+        {
+          "id": "sub-2-2",
+          "type": "texto-rico",
+          "props": {
+            "contenido": "<p style=\"font-weight:600;color:#008541;margin:1rem 0;\">Ya escuchamos a la comunidad universitaria. Gracias por participar. Ahora estamos analizando lo que nos dijiste.</p>"
+          }
+        },
+        {
+          "id": "sub-2-3",
+          "type": "texto-rico",
+          "props": {
+            "contenido": "<p>De esta forma, completaremos la segunda etapa de relevamiento y sistematización de la información de las siguientes 6 (seis) dimensiones establecidas por el Honorable Consejo Superior:</p>"
+          }
+        },
+        {
+          "id": "sub-2-4",
+          "type": "texto-rico",
+          "props": {
+            "contenido": "<ol style=\"list-style:none;padding:0;margin:1rem 0;\"><li style=\"display:flex;align-items:center;gap:0.75rem;margin-bottom:0.625rem;\"><span style=\"width:1.75rem;height:1.75rem;border-radius:9999px;background:rgba(0,133,65,0.12);color:#008541;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;\">1</span><span style=\"font-weight:600;\">Gobierno y Gestión</span></li><li style=\"display:flex;align-items:center;gap:0.75rem;margin-bottom:0.625rem;\"><span style=\"width:1.75rem;height:1.75rem;border-radius:9999px;background:rgba(0,133,65,0.12);color:#008541;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;\">2</span><span style=\"font-weight:600;\">Docencia</span></li><li style=\"display:flex;align-items:center;gap:0.75rem;margin-bottom:0.625rem;\"><span style=\"width:1.75rem;height:1.75rem;border-radius:9999px;background:rgba(0,133,65,0.12);color:#008541;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;\">3</span><span style=\"font-weight:600;\">Investigación</span></li><li style=\"display:flex;align-items:center;gap:0.75rem;margin-bottom:0.625rem;\"><span style=\"width:1.75rem;height:1.75rem;border-radius:9999px;background:rgba(0,133,65,0.12);color:#008541;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;\">4</span><span style=\"font-weight:600;\">Extensión</span></li><li style=\"display:flex;align-items:center;gap:0.75rem;margin-bottom:0.625rem;\"><span style=\"width:1.75rem;height:1.75rem;border-radius:9999px;background:rgba(0,133,65,0.12);color:#008541;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;\">5</span><span style=\"font-weight:600;\">Vinculación</span></li><li style=\"display:flex;align-items:center;gap:0.75rem;margin-bottom:0.625rem;\"><span style=\"width:1.75rem;height:1.75rem;border-radius:9999px;background:rgba(0,133,65,0.12);color:#008541;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;\">6</span><span style=\"font-weight:600;\">Infraestructura, recursos y centros de documentación</span></li></ol>"
+          }
+        },
+        {
+          "id": "sub-2-5",
+          "type": "titulo-bloque",
+          "props": {
+            "texto": "ENCUESTAS REALIZADAS A TODOS LOS CLAUSTROS DE LA UNLu Y ORGANIZACIONES DE LA ZONA DE INFLUENCIA",
+            "nivel": "h2"
+          }
+        },
+        {
+          "id": "sub-2-6",
+          "type": "texto-rico",
+          "props": {
+            "contenido": "<p>Hemos cumplido con lo encomendado por el Honorable Consejo Superior (HCS). Valoramos gratamente el compromiso demostrado por estudiantes, graduados, docentes y nodocentes para la mejora de la calidad de nuestra querida Universidad. Así, las percepciones/juicios de cada claustro que integra nuestra Comunidad quedan expresadas formalmente en un documento de carácter institucional.</p><p>Queremos mencionar y agradecer, también, a las organizaciones de la zona de influencia que participaron.</p><p>Ahora el HCS ha remitido el Informe Final a la Comisión Asesora Permanente de Planeamiento y Desarrollo Universitario. Invitamos a todos a tomar conocimiento de los resultados obtenidos.</p><p style=\"font-weight:600;color:#008541;margin:1rem 0;\">Octubre 2023.</p>"
+          }
+        },
+        {
+          "id": "sub-2-7",
+          "type": "link-card",
+          "props": {
+            "text": "Concluimos el análisis de las encuestas realizadas y lo compartimos",
+            "url": "https://drive.google.com/file/d/1cqDMWRbcddCozoGt9oBDv7oHRwxdKA1m/view?ts=6566130c"
+          }
+        }
+      ]
+    },
+    {
+      "id": "block-3",
+      "type": "separator",
+      "props": {}
+    },
+    {
+      "id": "block-4",
+      "type": "grilla-medios",
+      "props": {
+        "badge": "COMUNICACIÓN",
+        "titulo": "Entrevistas",
+        "descripcion": "A continuación, compartimos las iniciativas que venimos desarrollando para sensibilizar y comunicar a la comunidad universitaria nuestro proceso de Autoevaluación Institucional, dando cumplimiento a lo encomendado por el Honorable Consejo Superior.",
+        "items": "[{\"tipo\":\"youtube\",\"id\":\"USB3P-5VUE8\",\"titulo\":\"ENTREVISTA AUTOEVALUACIÓN MARIO OLORIZ\"},{\"tipo\":\"youtube\",\"id\":\"9O8zoZAYmW8\",\"titulo\":\"ENTREVISTA AUTOEVALUACIÓN PATRICIA AZPARREN\"},{\"tipo\":\"facebook\",\"url\":\"https://www.facebook.com/100027364012969/posts/pfbid024rwDy6hKEvnJHRNwXJBAxX1JC4DnHnXXyYsfCP8bcK7NAe5h9F9eou8ThA7oe8idl\",\"plataforma\":\"Radio UNLu · Facebook\",\"titulo\":\"ENTREVISTA Nro 1 EN RADIO UNLu\"},{\"tipo\":\"soundcloud\",\"url\":\"https://soundcloud.com/radiounlu-647543511/patricia-azparren-y-walter-panessi\",\"titulo\":\"ENTREVISTA Nro 2 EN RADIO UNLu\"},{\"tipo\":\"soundcloud\",\"url\":\"https://soundcloud.com/radiounlu-647543511/patricia-azparren-1108\",\"titulo\":\"ENTREVISTA Nro 3 EN RADIO UNLu\"},{\"tipo\":\"facebook\",\"url\":\"https://m.facebook.com/story.php?story_fbid=pfbid0S4F7SiTjxpmRQDLJND3mJh8AyzSPyziYENDrXKzazHwAu9i5hPebVF3sP6QS7XiHl&id=100027364012969\",\"plataforma\":\"Publicación en Facebook\",\"titulo\":\"ENTREVISTA FLORENCIA CENDALLI\"},{\"tipo\":\"facebook\",\"url\":\"https://m.facebook.com/story.php?story_fbid=pfbid0S4F7SiTjxpmRQDLJND3mJh8AyzSPyziYENDrXKzazHwAu9i5hPebVF3sP6QS7XiHl&id=100027364012969\",\"plataforma\":\"Publicación en Facebook\",\"titulo\":\"ENTREVISTA GUILLERMO DELL'INMAGINE\"},{\"tipo\":\"link\",\"url\":\"http://www.prensa.unlu.edu.ar/?q=node/9085\",\"plataforma\":\"Nota de Prensa UNLu\",\"titulo\":\"PRENSA UNLu\"},{\"tipo\":\"link\",\"url\":\"http://www.prensa.unlu.edu.ar/?q=node/9011\",\"plataforma\":\"Presentación del Informe\",\"titulo\":\"PRESENTACIÓN INFORME - PRENSA UNLu\"},{\"tipo\":\"soundcloud\",\"url\":\"https://soundcloud.com/radiounlu-647543511/panessi-azparren-oloriz-1112\",\"titulo\":\"ÚLTIMA ENTREVISTA RADIO UNLu - PANESSI, OLORIZ, AZPARREN\"}]"
+      }
+    }
+  ]
+}

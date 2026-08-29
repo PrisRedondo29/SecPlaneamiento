@@ -6,6 +6,7 @@
 import "../styles/global.css";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+import AdminBar from "../components/admin/AdminBar.astro";
 
 interface Props {
   title?: string;
@@ -18,6 +19,8 @@ const {
   description = "Autoevaluación institucional, planificación estratégica y desarrollo de la Universidad Nacional de Luján.",
   activeSection = ""
 } = Astro.props;
+
+const isAdminPage = Astro.url.pathname.startsWith("/admin");
 ---
 
 <!doctype html>
@@ -43,6 +46,9 @@ const {
     </script>
   </head>
   <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-emerald-800 selection:text-white">
+    <!-- Barra flotante de administración (solo en vistas públicas) -->
+    {!isAdminPage && <AdminBar currentPageTitle={title} currentPageId={activeSection} />}
+
     <!-- Barra de navegación superior -->
     <Navbar activeSection={activeSection} />
 
@@ -52,6 +58,6 @@ const {
     </main>
 
     <!-- Pie de página institucional -->
-    <Footer />
+    {!isAdminPage && <Footer />}
   </body>
 </html>

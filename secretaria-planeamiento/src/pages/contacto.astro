@@ -6,6 +6,10 @@
  */
 import Layout from "../layouts/Layout.astro";
 import ContactForm from "../components/ContactForm.astro";
+import BlockRenderer from "../blocks/BlockRenderer.astro";
+import pageData from "../data/pages/contacto.json";
+
+const { meta = {}, blocks = [] } = pageData;
 ---
 
 <Layout 
@@ -48,15 +52,15 @@ import ContactForm from "../components/ContactForm.astro";
               class="h-8 w-auto opacity-90"
               style="filter: brightness(0) invert(1);"
             />
-            <span class="text-xs font-bold tracking-[0.18em] uppercase text-unlu-gold">
-              Secretaría de Planeamiento
+            <span class="text-xs font-bold tracking-[0.18em] uppercase text-unlu-gold" data-hero-badge>
+              {meta.heroBadge || "Secretaría de Planeamiento"}
             </span>
           </div>
-          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white font-serif leading-tight mb-3">
-            Ponete en contacto con nosotros
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white font-serif leading-tight mb-3" data-hero-title>
+            {meta.heroTitle || "Ponete en contacto con nosotros"}
           </h1>
-          <p class="text-sm sm:text-base text-white/80 leading-relaxed max-w-lg">
-            Consultas sobre autoevaluación institucional, Plan de Desarrollo (PDI) o presentación de proyectos y propuestas.
+          <p class="text-sm sm:text-base text-white/80 leading-relaxed max-w-lg" data-hero-subtitle>
+            {meta.heroSubtitle || "Consultas sobre autoevaluación institucional, Plan de Desarrollo (PDI) o presentación de proyectos y propuestas."}
           </p>
         </div>
 
@@ -73,7 +77,7 @@ import ContactForm from "../components/ContactForm.astro";
               </div>
               <div class="min-w-0">
                 <span class="block text-[10px] font-bold uppercase tracking-wider text-white/50 mb-0.5">Correo</span>
-                <span class="block text-sm font-semibold text-white group-hover:text-unlu-gold transition-colors break-all leading-snug">planeamiento@unlu.edu.ar</span>
+                <span class="block text-sm font-semibold text-white group-hover:text-unlu-gold transition-colors break-all leading-snug" data-hero-email>{meta.email || "planeamiento@unlu.edu.ar"}</span>
               </div>
             </a>
             <button
@@ -84,7 +88,7 @@ import ContactForm from "../components/ContactForm.astro";
               class="copy-btn shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/90 text-xs font-medium transition-all border border-white/15 cursor-pointer active:scale-95"
             >
               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 012-2v-8a2 2 0 01-2-2h-8a2 2 0 01-2 2v8a2 2 0 012 2z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 01-2-2v-8a2 2 0 01-2-2h-8a2 2 0 01-2 2v8a2 2 0 012 2z" />
               </svg>
               <span class="copy-label">Copiar</span>
             </button>
@@ -100,8 +104,8 @@ import ContactForm from "../components/ContactForm.astro";
               </div>
               <div class="min-w-0">
                 <span class="block text-[10px] font-bold uppercase tracking-wider text-white/50 mb-0.5">Teléfono</span>
-                <span class="block text-sm font-semibold text-white group-hover:text-unlu-gold transition-colors leading-snug">+54 (02323) 445100</span>
-                <span class="text-xs font-bold text-unlu-gold">Interno 1200</span>
+                <span class="block text-sm font-semibold text-white group-hover:text-unlu-gold transition-colors leading-snug" data-hero-phone>{meta.telefono || "+54 (02323) 445100"}</span>
+                <span class="text-xs font-bold text-unlu-gold">{meta.interno || "Interno 1200"}</span>
               </div>
             </a>
             <button
@@ -131,148 +135,62 @@ import ContactForm from "../components/ContactForm.astro";
     </div>
   </section>
 
-  <!-- ===== CUERPO: Atención al Público + Formulario ===== -->
+  <!-- ===== CUERPO: Bloques Editables (Atención al Público + Formulario de Consulta) ===== -->
   <div class="bg-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-6">
-
-      <!-- Atención al Público + Mapa (Toggle integrado) -->
-      <div class="mb-10" id="atencion-card">
-        <div class="bg-unlu-green rounded-2xl overflow-hidden shadow-md">
-
-          <!-- Cabecera clickeable (toggle) -->
-          <button
-            id="atencion-toggle"
-            type="button"
-            aria-expanded="false"
-            aria-controls="atencion-mapa"
-            class="w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-unlu-gold"
-          >
-            <div class="flex flex-col sm:flex-row items-stretch">
-              <!-- Ícono lateral reloj -->
-              <div class="bg-unlu-green-dark flex items-center justify-center px-8 py-6 sm:py-0 shrink-0">
-                <svg class="w-12 h-12 text-unlu-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-
-              <!-- Info + controles -->
-              <div class="px-6 sm:px-8 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full">
-                <div>
-                  <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-unlu-gold mb-1">Atención al Público</span>
-                  <p class="text-white font-semibold text-base sm:text-lg leading-snug">
-                    Lunes a viernes · 8:00 a 16:00 hs.
-                  </p>
-                  <p class="text-white/75 text-sm mt-1">
-                    Consultas presenciales y recepción de documentación en Mesa de Entradas del Rectorado.
-                  </p>
-                </div>
-
-                <div class="flex items-center gap-3 shrink-0">
-                  <!-- Botón "Cómo llegar" (no toggle, abre Maps) -->
-                  <a
-                    href="https://maps.app.goo.gl/LiaPfuTYbCt3FMuU6"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onclick="event.stopPropagation()"
-                    class="inline-flex items-center gap-2 bg-unlu-gold hover:bg-yellow-400 text-unlu-green-dark font-bold text-sm px-4 py-2.5 rounded-lg transition-colors shadow-sm"
-                  >
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                    </svg>
-                    Cómo llegar
-                  </a>
-
-                  <!-- Indicador de ver mapa -->
-                  <div class="flex flex-col items-center gap-0.5 text-white/80 hover:text-white transition-colors">
-                    <svg id="map-icon-toggle" class="w-5 h-5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
-                    </svg>
-                    <span id="map-label-toggle" class="text-[9px] font-bold uppercase tracking-wider">Ver mapa</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </button>
-
-          <!-- Teaser del mapa (siempre visible, borroso → invita a hacer click) -->
-          <div
-            id="map-teaser"
-            class="relative h-16 overflow-hidden cursor-pointer transition-all duration-500"
-            aria-hidden="true"
-          >
-            <img
-              src="/mapa-unlu.png"
-              alt=""
-              class="w-full object-cover object-top scale-110 opacity-60"
-              style="height: 160px; margin-top: -30px;"
-            />
-            <!-- Gradiente que hace que se vea recortado/invitando -->
-            <div class="absolute inset-0 bg-gradient-to-b from-unlu-green/10 via-unlu-green/40 to-unlu-green/90"></div>
-            <!-- Texto central de invitación -->
-            <div class="absolute inset-0 flex items-center justify-center gap-2 text-white/90">
-              <svg class="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-              </svg>
-              <span class="text-xs font-bold uppercase tracking-widest">Ver mapa del campus</span>
-              <svg class="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
-
-          <!-- Panel del mapa completo (oculto por defecto) -->
-          <div
-            id="atencion-mapa"
-            class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out"
-            style="transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1);"
-          >
-            <!-- Header del mapa -->
-            <div class="px-6 sm:px-8 py-4 bg-unlu-green-dark border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <p class="text-white/80 text-sm">
-                La Secretaría de Planeamiento se ubica en el
-                <strong class="text-unlu-gold"> edificio&nbsp;8 </strong>
-                — Rectorado, Dpto. Cs. Básicas, Dpto. Tecnología y Secretarías.
-              </p>
-              <span class="shrink-0 inline-flex items-center gap-1.5 bg-unlu-gold text-unlu-green-dark text-xs font-black px-3 py-1.5 rounded-full shadow-sm">
-                <span class="w-5 h-5 bg-unlu-green text-white rounded-full flex items-center justify-center font-black text-xs">8</span>
-                Secretaría de Planeamiento
-              </span>
-            </div>
-            <!-- Imagen del mapa -->
-            <div class="relative bg-white">
-              <img
-                src="/mapa-unlu.png"
-                alt="Mapa del campus UNLu. El edificio 8 corresponde al Rectorado donde se encuentra la Secretaría de Planeamiento."
-                class="w-full h-auto object-contain max-h-[520px]"
-              />
-              <!-- Badge flotante -->
-              <div class="absolute bottom-4 right-4 bg-unlu-green text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-lg flex items-center gap-2">
-                <span class="w-5 h-5 bg-unlu-gold text-unlu-green-dark rounded-full flex items-center justify-center font-black text-xs shrink-0">8</span>
-                Aquí nos encontrás
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-
-      <!-- Formulario de Contacto -->
-      <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
-        <div class="bg-gradient-to-r from-gray-50 to-white px-6 sm:px-8 py-6 border-b border-gray-100">
-          <h2 class="text-xl font-bold text-gray-900 font-serif tracking-tight">Envianos tu consulta</h2>
-          <p class="text-gray-600 text-sm mt-1">¿Necesitás realizar una consulta o comunicarte con la Secretaría de Planeamiento?</p>
-          <p class="text-gray-600 text-sm mt-1">Podés hacerlo a través de nuestro formulario de contacto.</p>
-        </div>
-        <div class="px-6 sm:px-8 py-8">
-          <ContactForm />
-        </div>
-      </div>
-
+      <BlockRenderer blocks={blocks} />
     </div>
   </div>
 </Layout>
+
+<script is:inline>
+  window.toggleMapExpand = function(btn) {
+    const container = btn.closest('.card-atencion-mapa-container');
+    if (!container) return;
+    const teaserBar = container.querySelector('.map-teaser-bar');
+    const expandedPanel = container.querySelector('.map-expanded-panel');
+    const btnText = container.querySelector('.map-btn-text');
+    const btnArrow = container.querySelector('.map-btn-arrow');
+    const isExpanded = container.getAttribute('data-expanded') === 'true';
+
+    if (isExpanded) {
+      container.setAttribute('data-expanded', 'false');
+      if (teaserBar) teaserBar.style.display = 'flex';
+      if (expandedPanel) expandedPanel.style.display = 'none';
+      if (btnText) btnText.textContent = 'Ver mapa';
+      if (btnArrow) btnArrow.style.transform = 'rotate(0deg)';
+    } else {
+      container.setAttribute('data-expanded', 'true');
+      if (teaserBar) teaserBar.style.display = 'none';
+      if (expandedPanel) expandedPanel.style.display = 'block';
+      if (btnText) btnText.textContent = 'Ocultar mapa';
+      if (btnArrow) btnArrow.style.transform = 'rotate(180deg)';
+    }
+  };
+
+  window.toggleMapExpandFromTeaser = function(teaserEl) {
+    const container = teaserEl.closest('.card-atencion-mapa-container');
+    if (!container) return;
+    const btn = container.querySelector('button[onclick*="toggleMapExpand"]');
+    if (btn) toggleMapExpand(btn);
+  };
+
+  (function() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('unlu_blocks_v30') || '{}');
+      const data = saved['contacto'];
+      if (!data) return;
+      const meta = data.meta;
+      if (meta) {
+        if (meta.heroBadge) { document.querySelectorAll('[data-hero-badge]').forEach(el => el.textContent = meta.heroBadge); }
+        if (meta.heroTitle) { document.querySelectorAll('[data-hero-title]').forEach(el => el.textContent = meta.heroTitle); }
+        if (meta.heroSubtitle) { document.querySelectorAll('[data-hero-subtitle]').forEach(el => el.textContent = meta.heroSubtitle); }
+        if (meta.email) { document.querySelectorAll('[data-hero-email]').forEach(el => el.textContent = meta.email); }
+        if (meta.telefono) { document.querySelectorAll('[data-hero-phone]').forEach(el => el.textContent = meta.telefono); }
+      }
+    } catch(e) {}
+  })();
+</script>
 
 <script>
   const toggle = document.getElementById('atencion-toggle');
@@ -296,6 +214,7 @@ import ContactForm from "../components/ContactForm.astro";
         teaser.style.opacity = '1';
         if (mapIcon) mapIcon.style.transform = 'rotate(0deg)';
         if (mapLabel) mapLabel.textContent = 'Ver mapa';
+        document.getElementById('map-btn-toggle')?.classList.remove('bg-unlu-gold', 'text-unlu-green-dark', 'border-unlu-gold');
       } else {
         // Abrir
         panel.style.maxHeight = panel.scrollHeight + 'px';
@@ -303,7 +222,8 @@ import ContactForm from "../components/ContactForm.astro";
         teaser.style.height = '0px';
         teaser.style.opacity = '0';
         if (mapIcon) mapIcon.style.transform = 'rotate(180deg)';
-        if (mapLabel) mapLabel.textContent = 'Ocultar';
+        if (mapLabel) mapLabel.textContent = 'Ocultar mapa';
+        document.getElementById('map-btn-toggle')?.classList.add('bg-unlu-gold', 'text-unlu-green-dark', 'border-unlu-gold');
       }
     });
   }

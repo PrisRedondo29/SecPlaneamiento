@@ -1,0 +1,188 @@
+---
+/**
+ * Componente: AdminSiteManager
+ * Administración general del sitio y reordenamiento de menú principal.
+ * Reemplazo moderno de la pantalla /node/15 de Drupal.
+ */
+---
+
+<div class="space-y-6">
+  <!-- Header de la Sección -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+    <div>
+      <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
+        <a href="/admin" class="hover:text-unlu-green">Dashboard</a>
+        <span>/</span>
+        <span class="text-slate-900 font-bold">Administración del Sitio</span>
+      </div>
+      <h1 class="text-xl sm:text-2xl font-bold text-slate-900 font-sans">
+        Estructura y Gestión de Contenidos del Sitio
+      </h1>
+      <p class="text-xs text-slate-500 mt-0.5">
+        Visualiza todas las páginas existentes, gestiona su estado y ajusta el menú principal.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button
+        onclick="window.switchTab('editor', 'new')"
+        class="inline-flex items-center gap-2 bg-unlu-green hover:bg-unlu-green-dark text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md transition-transform active:scale-95 cursor-pointer"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>+ Nueva Página</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Pestañas de Sub-Sección: Páginas del Sitio vs Menú Principal -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+    <div class="bg-slate-50 border-b border-slate-200 px-6 py-3 flex items-center gap-6">
+      <button class="text-xs font-bold text-unlu-green border-b-2 border-unlu-green pb-2 -mb-3">
+        📄 Listado de Páginas (14)
+      </button>
+      <button class="text-xs font-semibold text-slate-500 hover:text-slate-900 pb-2 -mb-3 transition-colors">
+        🔗 Menú Principal de Navegación
+      </button>
+      <button class="text-xs font-semibold text-slate-500 hover:text-slate-900 pb-2 -mb-3 transition-colors">
+        ⚙️ Ajustes Globales
+      </button>
+    </div>
+
+    <!-- Tabla de Páginas -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-100/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
+          <tr>
+            <th class="px-6 py-3.5">Título de la Página</th>
+            <th class="px-6 py-3.5">Ruta URL</th>
+            <th class="px-6 py-3.5">Estado</th>
+            <th class="px-6 py-3.5">Autor</th>
+            <th class="px-6 py-3.5">Última Edición</th>
+            <th class="px-6 py-3.5 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 font-medium text-slate-800">
+          
+          <!-- Fila 1 -->
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="px-6 py-4">
+              <div class="font-bold text-slate-900 text-sm">Autoevaluación Institucional</div>
+              <div class="text-[11px] text-slate-500">Sección principal con encuestas e informe HCS</div>
+            </td>
+            <td class="px-6 py-4 font-mono text-slate-600">/autoevaluacion</td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Publicado
+              </span>
+            </td>
+            <td class="px-6 py-4 text-slate-600">usuplanea</td>
+            <td class="px-6 py-4 text-slate-500">Hoy 16:24</td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <a href="/autoevaluacion" target="_blank" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200" title="Ver en vivo">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                </a>
+                <button
+                  onclick="window.switchTab('editor', 'autoevaluacion')"
+                  class="bg-unlu-green/10 hover:bg-unlu-green text-unlu-green hover:text-white font-bold px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  Editar
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Fila 2 -->
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="px-6 py-4">
+              <div class="font-bold text-slate-900 text-sm">Plan de Desarrollo Institucional (PDI)</div>
+              <div class="text-[11px] text-slate-500">Lineamientos estratégicos decenio 2025-2035</div>
+            </td>
+            <td class="px-6 py-4 font-mono text-slate-600">/plan-desarrollo</td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Publicado
+              </span>
+            </td>
+            <td class="px-6 py-4 text-slate-600">usuplanea</td>
+            <td class="px-6 py-4 text-slate-500">22/05/2026</td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <a href="/plan-desarrollo" target="_blank" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200" title="Ver en vivo">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                </a>
+                <button
+                  onclick="window.switchTab('editor', 'pdi')"
+                  class="bg-unlu-green/10 hover:bg-unlu-green text-unlu-green hover:text-white font-bold px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  Editar
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Fila 3 -->
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="px-6 py-4">
+              <div class="font-bold text-slate-900 text-sm">La Secretaría</div>
+              <div class="text-[11px] text-slate-500">Misión, visión, valores y equipo directivo</div>
+            </td>
+            <td class="px-6 py-4 font-mono text-slate-600">/la-secretaria</td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Publicado
+              </span>
+            </td>
+            <td class="px-6 py-4 text-slate-600">usuplanea</td>
+            <td class="px-6 py-4 text-slate-500">12/04/2026</td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <a href="/la-secretaria" target="_blank" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200" title="Ver en vivo">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                </a>
+                <button
+                  onclick="window.switchTab('editor', 'la-secretaria')"
+                  class="bg-unlu-green/10 hover:bg-unlu-green text-unlu-green hover:text-white font-bold px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  Editar
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Fila 4 -->
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="px-6 py-4">
+              <div class="font-bold text-slate-900 text-sm">Contacto e Internos</div>
+              <div class="text-[11px] text-slate-500">Ubicación, horario de atención e internos telefónicos</div>
+            </td>
+            <td class="px-6 py-4 font-mono text-slate-600">/contacto</td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Publicado
+              </span>
+            </td>
+            <td class="px-6 py-4 text-slate-600">usuplanea</td>
+            <td class="px-6 py-4 text-slate-500">18/02/2026</td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <a href="/contacto" target="_blank" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200" title="Ver en vivo">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                </a>
+                <button
+                  onclick="window.switchTab('editor', 'contacto')"
+                  class="bg-unlu-green/10 hover:bg-unlu-green text-unlu-green hover:text-white font-bold px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  Editar
+                </button>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

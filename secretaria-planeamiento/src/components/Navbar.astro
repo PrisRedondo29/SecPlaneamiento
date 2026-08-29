@@ -71,6 +71,9 @@ const navLinks = [
         <a href="https://webmail.unlu.edu.ar/" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">Webmail</a>
         <a href="https://www.unlu.edu.ar/acceso-aulas-virtuales.html" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">Aulas Virtuales</a>
         <a href="https://www.biblioteca.unlu.edu.ar/" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">Biblioteca</a>
+        <a href="/admin" id="nav-admin-link" class="text-unlu-gold font-bold hover:underline flex items-center gap-1 bg-unlu-green/20 px-2 py-0.5 rounded border border-unlu-gold/30">
+          <span>🔑 Iniciar Sesión</span>
+        </a>
       </div>
     </div>
   </div>
@@ -242,5 +245,16 @@ const navLinks = [
         iconClose.classList.add('hidden');
       });
     });
+  }
+
+  // Actualizar enlace de inicio de sesión en Navbar
+  const navAdminLink = document.getElementById('nav-admin-link');
+  if (navAdminLink) {
+    const isLoggedIn = localStorage.getItem('unlu_admin_logged_in') === 'true';
+    if (isLoggedIn) {
+      navAdminLink.innerHTML = '<span>🔐 Dashboard Admin</span>';
+    } else {
+      navAdminLink.innerHTML = '<span>🔑 Iniciar Sesión</span>';
+    }
   }
 </script>

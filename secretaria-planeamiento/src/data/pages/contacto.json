@@ -1,0 +1,34 @@
+{
+  "pageId": "contacto",
+  "meta": {
+    "title": "Contacto · Secretaría de Planeamiento UNLu",
+    "activeSection": "contacto",
+    "heroTitle": "Ponete en contacto con nosotros",
+    "heroBadge": "SECRETARÍA DE PLANEAMIENTO",
+    "heroSubtitle": "Consultas sobre autoevaluación institucional, Plan de Desarrollo (PDI) o presentación de proyectos y propuestas.",
+    "email": "planeamiento@unlu.edu.ar",
+    "telefono": "+54 (02323) 445100",
+    "interno": "Interno 1200"
+  },
+  "blocks": [
+    {
+      "id": "block-cnt-atencion",
+      "type": "card-atencion-mapa",
+      "props": {
+        "badge": "ATENCIÓN AL PÚBLICO",
+        "horario": "Lunes a viernes · 8:00 a 16:00 hs.",
+        "descripcion": "Consultas presenciales y recepción de documentación en Mesa de Entradas del Rectorado. La Secretaría de Planeamiento se ubica en el Edificio 8 — Rectorado.",
+        "urlMapa": "https://maps.app.goo.gl/LiaPfuTYbCt3FMuU6",
+        "imagenMapa": "/mapa-unlu.png"
+      }
+    },
+    {
+      "id": "block-cnt-form",
+      "type": "card-formulario-contacto",
+      "props": {
+        "titulo": "Envianos tu consulta",
+        "subtitulo": "¿Necesitás realizar una consulta o comunicarte con la Secretaría de Planeamiento? Podés hacerlo a través de nuestro formulario de contacto."
+      }
+    }
+  ]
+}

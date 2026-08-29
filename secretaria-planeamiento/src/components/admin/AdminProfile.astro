@@ -1,0 +1,160 @@
+---
+/**
+ * Componente: AdminProfile
+ * Perfil de usuario y Configuración de Cuenta de usuplanea.
+ * Reemplazo moderno de las pantallas /user/3 y /user/3/edit de Drupal.
+ */
+---
+
+<div class="space-y-6">
+  <!-- Header de Perfil -->
+  <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+    <div class="flex items-center gap-4">
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-unlu-green-dark to-emerald-500 text-white font-bold text-xl flex items-center justify-center shadow-lg border-2 border-white">
+        UP
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl font-bold text-slate-900 font-sans">usuplanea</h1>
+          <span class="bg-emerald-100 text-unlu-green border border-emerald-300 text-xs font-bold px-2.5 py-0.5 rounded-full">
+            Administrador Principal
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 mt-1 flex items-center gap-3">
+          <span>Correo: <strong class="text-slate-700">planeamiento@unlu.edu.ar</strong></span>
+          <span>•</span>
+          <span>Antigüedad: <strong class="text-slate-700">Miembro durante 16 años y 5 meses</strong></span>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 w-full sm:w-auto">
+      <button
+        onclick="alert('Has cerrado la sesión simulada.'); window.location.href='/';"
+        class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-4 py-2.5 rounded-xl transition-colors"
+      >
+        Cerrar Sesión
+      </button>
+    </div>
+  </div>
+
+  <!-- Formulario de Edición de Cuenta -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 space-y-6">
+    <div class="border-b border-slate-100 pb-4">
+      <h2 class="text-lg font-bold text-slate-900 font-sans">Ajustes y Seguridad de la Cuenta</h2>
+      <p class="text-xs text-slate-500">Actualiza tus credenciales, zona horaria y preferencias de notificación</p>
+    </div>
+
+    <form id="profile-form" onsubmit="event.preventDefault(); alert('¡Perfil actualizado con éxito!');" class="space-y-6">
+
+      <!-- Sección 1: Correo e Identidad -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">
+            Nombre de Usuario
+          </label>
+          <input
+            type="text"
+            value="usuplanea"
+            disabled
+            class="w-full bg-slate-100 border border-slate-300 text-slate-500 text-xs font-semibold rounded-xl px-3.5 py-2.5 cursor-not-allowed"
+          />
+          <p class="text-[11px] text-slate-400 mt-1">El nombre de usuario administrado por sistema no se puede modificar.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">
+            Dirección de correo electrónico <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            value="planeamiento@unlu.edu.ar"
+            class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-xs font-semibold rounded-xl px-3.5 py-2.5 focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none"
+          />
+          <p class="text-[11px] text-slate-500 mt-1">Una dirección de correo electrónica válida para notificaciones.</p>
+        </div>
+      </div>
+
+      <!-- Sección 2: Cambio de Contraseña -->
+      <div class="border-t border-slate-100 pt-5 space-y-4">
+        <h3 class="text-sm font-bold text-slate-900">Cambiar Contraseña</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Clave Actual</label>
+            <input
+              type="password"
+              placeholder="••••••••••••"
+              class="w-full bg-slate-50 border border-slate-300 text-xs rounded-xl px-3.5 py-2.5 focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nueva Contraseña</label>
+            <input
+              type="password"
+              placeholder="••••••••••••"
+              class="w-full bg-slate-50 border border-slate-300 text-xs rounded-xl px-3.5 py-2.5 focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Confirmar Nueva Contraseña</label>
+            <input
+              type="password"
+              placeholder="••••••••••••"
+              class="w-full bg-slate-50 border border-slate-300 text-xs rounded-xl px-3.5 py-2.5 focus:bg-white focus:ring-2 focus:ring-unlu-green outline-none"
+            />
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 flex items-center justify-between text-xs">
+          <span class="text-slate-600 font-medium">Fortaleza de la contraseña:</span>
+          <span class="font-bold text-emerald-600 flex items-center gap-1.5">
+            <span class="w-16 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+            Muy Segura
+          </span>
+        </div>
+      </div>
+
+      <!-- Sección 3: Opciones de Regionalización & Bloques -->
+      <div class="border-t border-slate-100 pt-5 space-y-4">
+        <h3 class="text-sm font-bold text-slate-900">Opciones de Regionalización y Bloques</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Zona Horaria</label>
+            <select class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs font-medium rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-unlu-green outline-none">
+              <option selected>America/Argentina/Buenos_Aires (GMT -03:00)</option>
+              <option>America/Cordoba</option>
+              <option>America/Mendoza</option>
+            </select>
+            <p class="text-[11px] text-slate-500 mt-1">Hora local actual: Viernes 28 de Agosto, 2026 - 16:30</p>
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <label class="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+              <input type="checkbox" checked class="rounded text-unlu-green focus:ring-unlu-green w-4 h-4" />
+              <span>Formulario de contacto personal activado</span>
+            </label>
+            <label class="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+              <input type="checkbox" checked class="rounded text-unlu-green focus:ring-unlu-green w-4 h-4" />
+              <span>Notificaciones de publicación en email</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón Guardar -->
+      <div class="pt-4 border-t border-slate-100 flex items-center justify-end">
+        <button
+          type="submit"
+          class="bg-unlu-green hover:bg-unlu-green-dark text-white text-sm font-bold px-6 py-2.5 rounded-xl shadow-md transition-transform active:scale-95 cursor-pointer"
+        >
+          Guardar Ajustes de Perfil
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

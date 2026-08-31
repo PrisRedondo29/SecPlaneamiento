@@ -198,6 +198,7 @@ const { meta = {}, blocks = [] } = pageData;
   const teaser = document.getElementById('map-teaser');
   const mapIcon = document.getElementById('map-icon-toggle');
   const mapLabel = document.getElementById('map-label-toggle');
+  const mapChevron = document.getElementById('map-chevron-toggle');
 
   if (toggle && panel && teaser) {
     // El teaser también abre el mapa al clickear
@@ -212,7 +213,6 @@ const { meta = {}, blocks = [] } = pageData;
         toggle.setAttribute('aria-expanded', 'false');
         teaser.style.height = '4rem'; // h-16
         teaser.style.opacity = '1';
-        if (mapIcon) mapIcon.style.transform = 'rotate(0deg)';
         if (mapLabel) mapLabel.textContent = 'Ver mapa';
         document.getElementById('map-btn-toggle')?.classList.remove('bg-unlu-gold', 'text-unlu-green-dark', 'border-unlu-gold');
       } else {

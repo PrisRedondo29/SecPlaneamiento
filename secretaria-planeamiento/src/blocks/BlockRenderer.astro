@@ -1,0 +1,41 @@
+---
+/**
+ * Componente: BlockRenderer
+ * Renderiza una página completa a partir de un array de bloques JSON.
+ * Es el puente entre el sistema de bloques y el HTML final de las páginas Astro.
+ */
+import { renderBlock } from './block-registry.js';
+import ContactForm from '../components/ContactForm.astro';
+
+interface BlockDef {
+  id: string;
+  type: string;
+  props: Record<string, any>;
+}
+
+interface Props {
+  blocks: BlockDef[];
+}
+
+const { blocks = [] } = Astro.props;
+---
+
+<div class="page-block-content space-y-8">
+  {blocks.map((block) => {
+    if (block.type === 'card-formulario-contacto') {
+      const elementId = block.anchorId || block.id;
+      return (
+        <div id={elementId} class="scroll-mt-28 bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden mb-10">
+          <div class="bg-gradient-to-r from-gray-50 to-white px-6 sm:px-8 py-6 border-b border-gray-100">
+            <h2 class="text-xl font-bold text-gray-900 font-serif tracking-tight">{block.props?.titulo || 'Envianos tu consulta'}</h2>
+            <p class="text-gray-600 text-sm mt-1">{block.props?.subtitulo || '¿Necesitás realizar una consulta o comunicarte con la Secretaría de Planeamiento?'}</p>
+          </div>
+          <div class="px-6 sm:px-8 py-8">
+            <ContactForm />
+          </div>
+        </div>
+      );
+    }
+    return <Fragment set:html={renderBlock(block)} />;
+  })}
+</div>

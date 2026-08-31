@@ -1,426 +1,68 @@
 ---
 /**
  * Página: Autoevaluación Institucional
- * Contenido oficial completo de la sección de Autoevaluación Institucional.
- * Diseño fiel al prototipo de Lovable aprobado por la secretaría, incluyendo
- * cabecera verde de banner, tarjetas para documentos oficiales, y la sección
- * de entrevistas con reproductores y ventanas de previsualización interactiva para las 10 entrevistas.
+ *
+ * Sistema de Bloques (Opción C): Esta página ya NO contiene HTML de contenido.
+ * El contenido está en src/data/pages/autoevaluacion.json como un array de bloques.
+ * BlockRenderer convierte esos bloques en HTML usando las funciones render() del
+ * block-registry.js — garantizando que el Editor del Dashboard y esta página
+ * muestren EXACTAMENTE el mismo resultado.
+ *
+ * Para editar el contenido: Dashboard Admin → Editor de Páginas → Autoevaluación
+ * Para añadir un bloque nuevo: src/blocks/block-registry.js
  */
 import Layout from "../layouts/Layout.astro";
-import Breadcrumb from "../components/Breadcrumb.astro";
+import BlockRenderer from "../blocks/BlockRenderer.astro";
+import pageData from "../data/pages/autoevaluacion.json";
 
-// Dimensiones oficiales establecidas por el HCS
-const dimensions = [
-  "Gobierno y Gestión",
-  "Docencia",
-  "Investigación",
-  "Extensión",
-  "Vinculación",
-  "Infraestructura, recursos y centros de documentación"
-];
+const { meta, blocks } = pageData;
 ---
 
-<Layout 
-  title="Autoevaluación Institucional · Secretaría de Planeamiento UNLu" 
-  activeSection="autoevaluacion"
->
-  <!-- Cabecera Verde de la página (Fiel al Banner del prototipo) -->
+<Layout title={meta.title} activeSection={meta.activeSection}>
+
+  <!-- Cabecera Hero (estructura fija de todas las páginas) -->
   <section class="bg-linear-to-r from-unlu-green to-unlu-green-dark text-white py-12 lg:py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <!-- Migas de Pan incorporadas en la cabecera -->
       <nav aria-label="Breadcrumb" class="pb-6">
         <ol class="flex items-center space-x-1.5 text-xs sm:text-sm text-white/70">
-          <li>
-            <a href="/" class="hover:text-white transition-colors">Inicio</a>
-          </li>
+          <li><a href="/" class="hover:text-white transition-colors">Inicio</a></li>
           <li class="flex items-center space-x-1.5">
             <span class="text-white/40">&gt;</span>
-            <span class="text-white font-medium" aria-current="page">Autoevaluación Institucional</span>
+            <span class="text-white font-medium" aria-current="page" data-hero-title>{meta.heroTitle}</span>
           </li>
         </ol>
       </nav>
-
-      <!-- Badge Dorado Uppercase -->
-      <span class="inline-block text-xs font-bold tracking-[0.15em] uppercase text-unlu-gold mb-3">
-        AUTOEVALUACION INSTITUCIONAL
+      <span class="inline-block text-xs font-bold tracking-[0.15em] uppercase text-unlu-gold mb-3" data-hero-badge>
+        {meta.heroBadge}
       </span>
-
-      <!-- Título Serif de la página -->
-      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-serif leading-tight max-w-4xl mb-4">
-        Autoevaluación Institucional
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-serif leading-tight max-w-4xl mb-4" data-hero-title>
+        {meta.heroTitle}
       </h1>
-
-      <!-- Bajada de la página -->
-      <p class="text-base sm:text-lg text-white/90 leading-relaxed max-w-3xl">
-        Proceso de relevamiento, análisis de claustros e informes de autoevaluación de la Universidad Nacional de Luján.
+      <p class="text-base sm:text-lg text-white/90 leading-relaxed max-w-3xl" data-hero-subtitle>
+        {meta.heroSubtitle}
       </p>
-
     </div>
   </section>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
-    <!-- 1. Tarjeta Horizontal del Informe de Autoevaluación (Drive del Informe) -->
-    <section id="informe" class="mb-14 scroll-mt-36">
-      <a 
-        href="https://drive.google.com/file/d/16iDGIcW67kV6GQcTB2XCJ1nAfPY4EOC-/view" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        class="block bg-unlu-green hover:bg-unlu-green-dark text-white rounded-lg p-6 sm:p-8 border-l-4 border-unlu-gold shadow-md transition-all hover:scale-[1.01] cursor-pointer"
-      >
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div class="flex items-start gap-4">
-            <div class="text-unlu-gold shrink-0 mt-1">
-              <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <div>
-              <span class="block text-[10px] font-bold uppercase tracking-wider text-unlu-gold mb-1">
-                Documento Principal
-              </span>
-              <h3 class="text-xl sm:text-2xl font-bold text-white font-serif">
-                Haga click aquí para acceder al Informe de la Autoevaluación Institucional
-              </h3>
-            </div>
-          </div>
-
-          <div>
-            <span class="inline-flex items-center justify-center px-5 py-3 rounded-lg font-bold text-sm bg-unlu-gold hover:bg-unlu-gold-dark text-unlu-black shadow-sm transition-all gap-1.5">
-              <span>Acceder</span>
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </span>
-          </div>
-        </div>
-      </a>
-    </section>
-
-    <!-- 2. Sección Integrada: Proceso y Encuestas (Análisis de respuestas) -->
-    <section id="encuestas" class="mb-14 scroll-mt-28 max-w-4xl mx-auto">
-      <div class="bg-white rounded-xl border border-gray-200 p-6 sm:p-10 shadow-xs">
-        
-        <!-- Badge + Título de Proceso de Autoevaluación -->
-        <div class="mb-6">
-          <span class="inline-block text-xs font-bold tracking-[0.15em] uppercase text-unlu-gold-dark mb-1">
-            PROCESO
-          </span>
-          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 font-serif">
-            Proceso de Autoevaluación Institucional
-          </h2>
-          <div class="h-[3px] bg-linear-to-r from-unlu-green via-unlu-gold to-unlu-red w-36 mt-2"></div>
-        </div>
-
-        <!-- Parte A: Relevamiento y las 6 Dimensiones -->
-        <div class="text-gray-700 space-y-4 text-sm sm:text-base leading-relaxed">
-          <p>
-            En la UNLu, estamos llevando a cabo el proceso de autoevaluación institucional.
-          </p>
-          <p>
-            Preparamos una serie de encuestas para escuchar a la comunidad universitaria y ayudar a autoevaluarnos. Para cada uno de los roles con los que participa una persona, hay una encuesta específica.
-          </p>
-          <p class="font-semibold text-unlu-green">
-            Ya escuchamos a la comunidad universitaria. Gracias por participar. Ahora estamos analizando lo que nos dijiste.
-          </p>
-          <p class="font-medium pt-2">
-            De esta forma, completaremos la segunda etapa de relevamiento y sistematización de la información de las siguientes 6 (seis) dimensiones establecidas por el Honorable Consejo Superior:
-          </p>
-          
-          <!-- Lista de 6 Dimensiones -->
-          <ol class="space-y-2.5 pl-2 font-semibold text-gray-800 my-4 text-sm sm:text-base">
-            {dimensions.map((dim, idx) => (
-              <li class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-full bg-unlu-green/10 text-unlu-green text-xs font-bold flex items-center justify-center shrink-0">
-                  {idx + 1}
-                </span>
-                <span>{dim}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        <!-- Línea divisoria sutil para integrar con el análisis de respuestas -->
-        <hr class="my-8 border-gray-200" />
-
-        <!-- Parte B: Encuestas y Análisis de respuestas -->
-        <div class="mt-8">
-          <div class="mb-6">
-            <h3 class="text-sm sm:text-base font-bold text-gray-800 uppercase tracking-wide leading-relaxed">
-              ENCUESTAS REALIZADAS A TODOS LOS CLAUSTROS DE LA UNLu Y ORGANIZACIONES DE LA ZONA DE INFLUENCIA
-            </h3>
-            <h4 class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-widest mt-1">
-              ANÁLISIS DE RESPUESTAS
-            </h4>
-          </div>
-
-          <div class="text-gray-700 space-y-4 text-sm sm:text-base leading-relaxed">
-            <p>
-              Hemos cumplido con lo encomendado por el Honorable Consejo Superior (HCS). Valoramos gratamente el compromiso demostrado por estudiantes, graduados, docentes y nodocentes para la mejora de la calidad de nuestra querida Universidad. Así, las percepciones/juicios de cada claustro que integran nuestra Comunidad quedan expresadas formalmente en un documento de carácter institucional.
-            </p>
-            <p>
-              Queremos mencionar y agradecer, también, a las organizaciones de la zona de influencia que participaron.
-            </p>
-            <p>
-              Ahora el HCS ha remitido el Informe Final a la Comisión Asesora Permanente de Planeamiento y Desarrollo Universitario. Invitamos a todos a tomar conocimiento de los resultados obtenidos.
-            </p>
-            <p class="font-bold text-gray-500 pt-2">
-              Octubre 2023.
-            </p>
-
-            <!-- Botón del Drive del Análisis de Respuestas -->
-            <a 
-              href="https://drive.google.com/file/d/1cqDMWRbcddCozoGt9oBDv7oHRwxdKA1m/view?ts=6566130c" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              class="block bg-slate-50 border border-gray-200 rounded-lg p-5 hover:border-unlu-gold hover:shadow-xs transition-all mt-6"
-            >
-              <div class="flex items-center gap-3 text-unlu-green">
-                <svg class="w-6 h-6 shrink-0 text-unlu-red" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-                <span class="font-bold text-sm sm:text-base hover:underline text-gray-805">
-                  Concluímos el análisis de las encuestas realizadas y lo compartimos
-                </span>
-              </div>
-            </a>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- Divisor Doblado / Línea de Puntos -->
-    <div class="max-w-4xl mx-auto my-12 text-center text-gray-300 tracking-[0.35em] select-none text-xs">
-      ...................................................................................................................................................
-    </div>
-
-    <!-- 3. Sección: Entrevistas y difusión (Con reproductores embebidos de video) -->
-    <section id="entrevistas" class="mb-16 scroll-mt-36">
-      <div class="mb-6">
-        <span class="inline-block text-xs font-bold tracking-[0.15em] uppercase text-unlu-gold-dark mb-2">
-          COMUNICACIÓN
-        </span>
-        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 font-serif">
-          Entrevistas
-        </h2>
-        <div class="h-[3px] bg-linear-to-r from-unlu-green via-unlu-gold to-unlu-red w-36 mt-2"></div>
-      </div>
-
-      <p class="text-sm sm:text-base text-gray-650 leading-relaxed max-w-4xl mb-8">
-        A continuación compartimos las iniciativas que venimos desarrollando para sensibilizar y comunicar a la comunidad universitaria nuestro proceso de Autoevaluación Institucional, dando cumplimiento a lo encomendado por el Honorable Consejo Superior.
-      </p>
-
-      <!-- Grilla de Previsualizaciones de todas las entrevistas (10 en total) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-        
-        <!-- 1. Video Mario Oloriz -->
-        <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs flex flex-col justify-between">
-          <div class="aspect-video bg-black relative">
-            <iframe 
-              class="w-full h-full absolute inset-0"
-              src="https://www.youtube.com/embed/USB3P-5VUE8" 
-              title="ENTREVISTA AUTOEVALUACIÓN MARIO OLORIZ" 
-              frameborder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              allowfullscreen
-            ></iframe>
-          </div>
-          <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-            <span class="font-bold text-gray-800 text-xs sm:text-sm font-serif">ENTREVISTA AUTOEVALUACIÓN MARIO OLORIZ</span>
-            <a href="https://www.youtube.com/watch?v=USB3P-5VUE8" target="_blank" class="text-xs font-bold text-unlu-red shrink-0 ml-2">Enlace</a>
-          </div>
-        </div>
-
-        <!-- 2. Video Patricia Azparren -->
-        <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs flex flex-col justify-between">
-          <div class="aspect-video bg-black relative">
-            <iframe 
-              class="w-full h-full absolute inset-0"
-              src="https://www.youtube.com/embed/9O8zoZAYmW8" 
-              title="ENTREVISTA AUTOEVALUACIÓN PATRICIA AZPARREN" 
-              frameborder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              allowfullscreen
-            ></iframe>
-          </div>
-          <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-            <span class="font-bold text-gray-800 text-xs sm:text-sm font-serif">ENTREVISTA AUTOEVALUACIÓN PATRICIA AZPARREN</span>
-            <a href="https://www.youtube.com/watch?v=9O8zoZAYmW8" target="_blank" class="text-xs font-bold text-unlu-red shrink-0 ml-2">Enlace</a>
-          </div>
-        </div>
-
-        <!-- 3. Entrevista Nro 1 Radio UNLu (Facebook Post) -->
-        <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs flex flex-col justify-between">
-          <div class="h-64 bg-slate-50 relative overflow-hidden flex items-center justify-center p-2">
-            <iframe 
-              src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2F100027364012969%2Fposts%2Fpfbid024rwDy6hKEvnJHRNwXJBAxX1JC4DnHnXXyYsfCP8bcK7NAe5h9F9eou8ThA7oe8idl%2F&show_text=true&width=500" 
-              width="100%" 
-              height="100%" 
-              style="border:none;overflow:hidden" 
-              scrolling="no" 
-              frameborder="0" 
-              allowfullscreen="true" 
-              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            ></iframe>
-          </div>
-          <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-            <span class="font-bold text-gray-800 text-xs sm:text-sm font-serif">ENTREVISTA Nro 1 EN RADIO UNLu</span>
-            <a href="https://www.facebook.com/100027364012969/posts/pfbid024rwDy6hKEvnJHRNwXJBAxX1JC4DnHnXXyYsfCP8bcK7NAe5h9F9eou8ThA7oe8idl/?sfnsn=scwspmo&mibextid=afzh1R" target="_blank" class="text-xs font-bold text-unlu-red shrink-0 ml-2">Enlace</a>
-          </div>
-        </div>
-
-        <!-- 4. Entrevista Nro 2 Radio UNLu (Soundcloud Player) -->
-        <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs flex flex-col justify-between">
-          <div class="h-64 bg-slate-50 flex items-center p-4">
-            <iframe 
-              width="100%" 
-              height="166" 
-              scrolling="no" 
-              frameborder="no" 
-              allow="autoplay" 
-              src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/radiounlu-647543511/patricia-azparren-y-walter-panessi&color=%23008541&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=true"
-            ></iframe>
-          </div>
-          <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-            <span class="font-bold text-gray-800 text-xs sm:text-sm font-serif">ENTREVISTA Nro 2 EN RADIO UNLu</span>
-            <a href="https://soundcloud.com/radiounlu-647543511/patricia-azparren-y-walter-panessi" target="_blank" class="text-xs font-bold text-unlu-red shrink-0 ml-2">Enlace</a>
-          </div>
-        </div>
-
-        <!-- 5. Entrevista Nro 3 Radio UNLu (Soundcloud Player) -->
-        <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs flex flex-col justify-between">
-          <div class="h-64 bg-slate-50 flex items-center p-4">
-            <iframe 
-              width="100%" 
-              height="166" 
-              scrolling="no" 
-              frameborder="no" 
-              allow="autoplay" 
-              src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/radiounlu-647543511/patricia-azparren-1108&color=%23008541&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=true"
-            ></iframe>
-          </div>
-          <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-            <span class="font-bold text-gray-800 text-xs sm:text-sm font-serif">ENTREVISTA Nro 3 EN RADIO UNLu</span>
-            <a href="https://soundcloud.com/radiounlu-647543511/patricia-azparren-1108?si=f4ba8de1da6643448f111f734f2c6c5a&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" target="_blank" class="text-xs font-bold text-unlu-red shrink-0 ml-2">Enlace</a>
-          </div>
-        </div>
-
-        <!-- 6. Entrevista Florencia Cendalli (Facebook Post) -->
-        <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs flex flex-col justify-between">
-          <div class="h-64 bg-slate-50 relative overflow-hidden flex items-center justify-center p-2">
-            <iframe 
-              src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2F100027364012969%2Fposts%2Fpfbid0S4F7SiTjxpmRQDLJND3mJh8AyzSPyziYENDrXKzazHwAu9i5hPebVF3sP6QS7XiHl&show_text=true&width=500" 
-              width="100%" 
-              height="100%" 
-              style="border:none;overflow:hidden" 
-              scrolling="no" 
-              frameborder="0" 
-              allowfullscreen="true" 
-              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            ></iframe>
-          </div>
-          <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-            <span class="font-bold text-gray-800 text-xs sm:text-sm font-serif">ENTREVISTA FLORENCIA CENDALLI</span>
-            <a href="https://m.facebook.com/story.php?story_fbid=pfbid0S4F7SiTjxpmRQDLJND3mJh8AyzSPyziYENDrXKzazHwAu9i5hPebVF3sP6QS7XiHl&id=100027364012969&mibextid=Nif5oz" target="_blank" class="text-xs font-bold text-unlu-red shrink-0 ml-2">Enlace</a>
-          </div>
-        </div>
-
-        <!-- 7. Entrevista Guillermo Dell'Inmagine (Facebook Post) -->
-        <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs flex flex-col justify-between">
-          <div class="h-64 bg-slate-50 relative overflow-hidden flex items-center justify-center p-2">
-            <iframe 
-              src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2F100027364012969%2Fposts%2Fpfbid0S4F7SiTjxpmRQDLJND3mJh8AyzSPyziYENDrXKzazHwAu9i5hPebVF3sP6QS7XiHl&show_text=true&width=500" 
-              width="100%" 
-              height="100%" 
-              style="border:none;overflow:hidden" 
-              scrolling="no" 
-              frameborder="0" 
-              allowfullscreen="true" 
-              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            ></iframe>
-          </div>
-          <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-            <span class="font-bold text-gray-800 text-xs sm:text-sm font-serif">ENTREVISTA GUILLERMO DELL'INMAGINE</span>
-            <a href="https://m.facebook.com/story.php?story_fbid=pfbid0S4F7SiTjxpmRQDLJND3mJh8AyzSPyziYENDrXKzazHwAu9i5hPebVF3sP6QS7XiHl&id=100027364012969&mibextid=Nif5oz" target="_blank" class="text-xs font-bold text-unlu-red shrink-0 ml-2">Enlace</a>
-          </div>
-        </div>
-
-        <!-- 8. Prensa UNLu (Browser Mockup Preview) -->
-        <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs flex flex-col justify-between">
-          <div class="h-64 bg-slate-100 flex flex-col">
-            <!-- Browser Top Bar -->
-            <div class="bg-gray-200 px-4 py-2 flex items-center gap-1.5 shrink-0 border-b border-gray-300">
-              <span class="w-3 h-3 rounded-full bg-red-400"></span>
-              <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
-              <span class="w-3 h-3 rounded-full bg-green-400"></span>
-              <div class="bg-white rounded-md text-[10px] text-gray-400 px-3 py-1 flex-1 ml-4 truncate font-sans select-none border border-gray-300">
-                prensa.unlu.edu.ar/?q=node/9085
-              </div>
-            </div>
-            <!-- Browser Body -->
-            <div class="flex-1 p-6 flex flex-col justify-center items-center text-center bg-white">
-              <svg class="w-12 h-12 text-unlu-green mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-              </svg>
-              <h5 class="text-sm font-bold text-gray-800">Nota de Prensa UNLu</h5>
-              <p class="text-xs text-gray-500 mt-1 max-w-xs">Visita el portal oficial de prensa para leer el artículo de Autoevaluación.</p>
-            </div>
-          </div>
-          <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-            <span class="font-bold text-gray-800 text-xs sm:text-sm font-serif">PRENSA UNLu</span>
-            <a href="http://www.prensa.unlu.edu.ar/?q=node/9085" target="_blank" class="text-xs font-bold text-unlu-red shrink-0 ml-2">Enlace</a>
-          </div>
-        </div>
-
-        <!-- 9. Presentación Informe Prensa UNLu (Browser Mockup Preview) -->
-        <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs flex flex-col justify-between">
-          <div class="h-64 bg-slate-100 flex flex-col">
-            <!-- Browser Top Bar -->
-            <div class="bg-gray-200 px-4 py-2 flex items-center gap-1.5 shrink-0 border-b border-gray-300">
-              <span class="w-3 h-3 rounded-full bg-red-400"></span>
-              <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
-              <span class="w-3 h-3 rounded-full bg-green-400"></span>
-              <div class="bg-white rounded-md text-[10px] text-gray-400 px-3 py-1 flex-1 ml-4 truncate font-sans select-none border border-gray-300">
-                prensa.unlu.edu.ar/?q=node/9011
-              </div>
-            </div>
-            <!-- Browser Body -->
-            <div class="flex-1 p-6 flex flex-col justify-center items-center text-center bg-white">
-              <svg class="w-12 h-12 text-unlu-green mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <h5 class="text-sm font-bold text-gray-800">Presentación del Informe en Prensa</h5>
-              <p class="text-xs text-gray-500 mt-1 max-w-xs">Visita el portal de prensa oficial para leer la nota de presentación.</p>
-            </div>
-          </div>
-          <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-            <span class="font-bold text-gray-800 text-xs sm:text-sm font-serif">PRESENTACIÓN INFORME - PRENSA UNLu</span>
-            <a href="http://www.prensa.unlu.edu.ar/?q=node/9011" target="_blank" class="text-xs font-bold text-unlu-red shrink-0 ml-2">Enlace</a>
-          </div>
-        </div>
-
-        <!-- 10. Última entrevista Radio UNLu (Soundcloud Player) -->
-        <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xs flex flex-col justify-between">
-          <div class="h-64 bg-slate-50 flex items-center p-4">
-            <iframe 
-              width="100%" 
-              height="166" 
-              scrolling="no" 
-              frameborder="no" 
-              allow="autoplay" 
-              src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/radiounlu-647543511/panessi-azparren-oloriz-1112&color=%23008541&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=true"
-            ></iframe>
-          </div>
-          <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-            <span class="font-bold text-gray-800 text-xs sm:text-sm font-serif">ÚLTIMA ENTREVISTA RADIO UNLu - PANESSI, OLORIZ, AZPARREN</span>
-            <a href="https://soundcloud.com/radiounlu-647543511/panessi-azparren-oloriz-1112" target="_blank" class="text-xs font-bold text-unlu-red shrink-0 ml-2">Enlace</a>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
+  <!-- Contenido principal generado desde bloques JSON -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" id="page-blocks-wrapper">
+    <BlockRenderer blocks={blocks} />
   </div>
+
 </Layout>
+
+<script is:inline>
+  (function() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('unlu_blocks_v30') || '{}');
+      const data = saved['autoevaluacion'];
+      if (!data) return;
+      const meta = data.meta;
+      if (meta) {
+        if (meta.heroBadge) { document.querySelectorAll('[data-hero-badge]').forEach(el => el.textContent = meta.heroBadge); }
+        if (meta.heroTitle) { document.querySelectorAll('[data-hero-title]').forEach(el => el.textContent = meta.heroTitle); }
+        if (meta.heroSubtitle) { document.querySelectorAll('[data-hero-subtitle]').forEach(el => el.textContent = meta.heroSubtitle); }
+      }
+    } catch(e) {}
+  })();
+</script>

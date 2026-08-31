@@ -6,6 +6,7 @@
 import "../styles/global.css";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+import AdminBar from "../components/admin/AdminBar.astro";
 
 interface Props {
   title?: string;
@@ -18,6 +19,8 @@ const {
   description = "Autoevaluación institucional, planificación estratégica y desarrollo de la Universidad Nacional de Luján.",
   activeSection = ""
 } = Astro.props;
+
+const isAdminPage = Astro.url.pathname.startsWith("/admin");
 ---
 
 <!doctype html>
@@ -25,7 +28,7 @@ const {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/escudo.svg" />
     <title>{title}</title>
     <meta name="description" content={description} />
 
@@ -33,8 +36,19 @@ const {
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+
+    <!-- Prevenir auto-scroll indeseado al recargar en iOS Safari / WebKit -->
+    <script is:inline>
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+      window.scrollTo(0, 0);
+    </script>
   </head>
   <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-emerald-800 selection:text-white">
+    <!-- Barra flotante de administración (solo en vistas públicas) -->
+    {!isAdminPage && <AdminBar currentPageTitle={title} currentPageId={activeSection} />}
+
     <!-- Barra de navegación superior -->
     <Navbar activeSection={activeSection} />
 
@@ -44,6 +58,6 @@ const {
     </main>
 
     <!-- Pie de página institucional -->
-    <Footer />
+    {!isAdminPage && <Footer />}
   </body>
 </html>

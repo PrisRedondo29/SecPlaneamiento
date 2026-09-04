@@ -7,17 +7,20 @@ Sitio web oficial de la Secretaría de Planeamiento de la Universidad Nacional d
 ## Inicio rápido
 
 ```bash
+# Entrar a la carpeta del proyecto
+cd secretaria-planeamiento
+
 # Instalar dependencias
-npm install
+pnpm install
 
 # Servidor de desarrollo (localhost:4321)
-npm run dev
+pnpm dev
 
 # Build para producción
-npm run build
+pnpm build
 
 # Vista previa del build
-npm run preview
+pnpm preview
 ```
 
 > **Requisito:** Node.js >= 22.12.0

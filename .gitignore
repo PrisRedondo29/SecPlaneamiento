@@ -1,41 +1,89 @@
-# ─── Archivos locales (documentos, recursos, etc.) ───────────────────────────
-/archivos
+# ==============================================================================
+# .gitignore - Secretaría de Planeamiento (UNLu)
+# ==============================================================================
 
-# ─── Dependencias ────────────────────────────────────────────────────────────
+# ─── 1. Archivos locales y recursos pesados ───────────────────────────────────
+/archivos/
+*.pdf
+*.zip
+*.tar.gz
+*.rar
+
+# ─── 2. Dependencias y gestores de paquetes ───────────────────────────────────
 node_modules/
 .pnp
 .pnp.js
+.pnpm-store/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
 
-# ─── Build output ─────────────────────────────────────────────────────────────
+# ─── 3. Salida de compilación (Build & Bundlers) ──────────────────────────────
 dist/
 .output/
-
-# ─── Astro ────────────────────────────────────────────────────────────────────
 .astro/
+.vercel/
+.turbo/
+.cache/
+.parcel-cache/
 
-# ─── Variables de entorno ─────────────────────────────────────────────────────
+# ─── 4. Variables de entorno y secretos (NUNCA subir a Git) ───────────────────
 .env
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
 .env.*.local
+*.env
+*.env.local
 
-# ─── Logs ─────────────────────────────────────────────────────────────────────
+# Permitir explícitamente las plantillas públicas
+!.env.example
+!.env.template
+
+# ─── 5. Logs y depuración ─────────────────────────────────────────────────────
 logs/
 *.log
 npm-debug.log*
-pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# ─── Sistema operativo ────────────────────────────────────────────────────────
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# ─── Editores / IDEs ──────────────────────────────────────────────────────────
-.vscode/
+# ─── 6. Editores e IDEs ───────────────────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
 .idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swo
+*.swn
+*.swp
+.fleet/
+.sublime-project
+.sublime-workspace
+
+# ─── 7. Sistema operativo (Windows, macOS, Linux) ─────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+desktop.ini
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# ─── 8. Archivos temporales y backups ─────────────────────────────────────────
+*.bak
+*.tmp
+*.temp
+*.orig
+*~

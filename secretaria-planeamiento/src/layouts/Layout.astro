@@ -23,6 +23,7 @@ const {
 const isAdminPage = Astro.url.pathname.startsWith("/admin");
 ---
 
+
 <!doctype html>
 <html lang="es" class="scroll-smooth">
   <head>
@@ -60,4 +61,5 @@ const isAdminPage = Astro.url.pathname.startsWith("/admin");
     <!-- Pie de página institucional -->
     {!isAdminPage && <Footer />}
   </body>
+
 </html>

@@ -1,0 +1,19 @@
+---
+import SearchIcon from "@/components/icons/SearchIcon.svg";
+---
+
+<form class="pt-10 flex gap-4 max-w-[80%] mx-auto">
+	<div class="relative flex items-center flex-1">
+		<input
+			type="search"
+			placeholder="Presentación de proyectos"
+			class="border rounded-lg p-2 pl-8 border-unlu-green-dark w-full"
+		/>
+		<SearchIcon class="absolute w-7 ml-1 stroke-unlu-green-dark" />
+	</div>
+	<button
+		type="submit"
+		class="bg-unlu-green px-4 rounded-lg text-white font-semibold hover:cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-300"
+		>Buscar</button
+	>
+</form>
